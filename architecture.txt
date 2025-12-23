@@ -1,0 +1,147 @@
+ORGANISATION DES CLASSES
+
+
+music_sorter/
+│
+│
+├── domain/ # MODELE METIER PUR: pas de mutagen, pas de discogs
+│   │ 
+│   ├── track.py # Représente un fichier audio individuel et ses informations: chemin, tags, identifié par AcousticId
+│   │            # Simple conteneur + logique métier légère
+│   │            # INTERACTIONS : tag_reader ; album ; album_builder ; discogs_matcher ; metadata_enricher
+│   │ 
+│   ├── album.py # Représente un album musical, regroupant plusieurs Track
+│   │            # Détermine album_artist (ou Unknown ou VA)
+│   │            # Détermine l'année (ou XXXX)
+│   │            # Détermine si compilation
+│   │            # INTERACTIONS : track ; album_builder ; path_builder ; discogs_service ; discogs_matcher ; discogs_enricher ; metadata_enricher ; mover ; config ; (artist)
+│   │
+│   ├── artist.py # inutile ?
+│   │             # INTERACTIONS : album ; discogs_service ; discogs_matcher ; discogs_enricher
+│   │
+│   └── __init__.py
+│
+│
+├── services/ # SERVICES EXTERNES
+│   │
+│   ├── discogs/
+│   │   │
+│   │   ├── discogs_result.py  # Dataclass
+│   │   │                      # INTERACTIONS : discogs_service ; discogs_matcher ; discogs_enricher
+│   │   │
+│   │   ├── discogs_service.py # Interroge l’API
+│   │   │                      # INTERACTIONS : discogs_result ; metadata_enricher ; discogs (API) ; album ; (artist)
+│   │   │
+│   │   │── discogs_matcher.py # Décide si un résultat correspond (c'est ici que les tests de validité ont lieu)
+│   │   │                      # INTERACTIONS : discogs_result ; metadata_enricher ; album ; track ; (artist)
+│   │   │
+│   │   │── discogs_enricher.py # Applique les données à l'album (artist, year, label, catno, styles)
+│   │   │                       # INTERACTIONS : discogs_result ; metadata_enricher ; album ; (artist)
+│   │   │
+│   |   └── __init__.py
+│   │
+│   │
+│   ├── tag_reader.py # Lit les tags audio avec mutagen
+│   │                 # Convertit un fichier → track
+│   │                 # Gère les fichiers sans tags ou non supportés
+│   │                 # INTERACTIONS : track ; sorter ; mutagen (API)
+│   │
+│   ├── acoustid_service.py # Génère une empreinte Chromaprint
+│   │                       # (= Shazam) Dernier recours avec acoustID (API)
+│   │                       # Ne modifie que le Track
+│   │                       # INTERACTIONS : track ; metadata_enricher ; acoustId (API)
+│   │
+│   └── __init__.py
+│
+│
+├── processing/ # LOGIQUE DE TRAITEMENT
+│   │
+│   ├── scanner.py # Parcourir dossier
+│   │              # Sélectionner fichier à traiter
+│   │              # INTERACTIONS : sorter ; config
+│   │
+│   ├── album_builder.py # Groupe les morceaux en album
+│   │                    # Gère les albums inconnus
+│   │                    # Détection compilation
+│   │                    # Définit l'album_artist et l'année
+│   │                    # INTERACTIONS : track ; album ; sorter
+│   │
+│   ├── metadata_enricher.py # Orchestre l'enrichissement des métadonnées. Ordre: discogs, acoustID, discogs à nouveau
+│   │                        # INTERACTIONS : album ; track ; discogs_service ; discogs_matcher ; discogs_enricher ; acoustId_service ; sorter
+│   │
+│   ├── sorter.py # Chef d’orchestre: appelle tout 
+│   │             # Aucune logique métier lourde/détaillée
+│   │             # Pas de GUI
+│   │             # INTERACTIONS : tout processing/ ; tag_reader ; controllers ; mover
+│   │
+│   └── __init__.py
+│
+│
+├── filesystem/ # GESTION DES FICHIERS
+│   │
+│   ├── path_builder.py # Construit les chemins selon le format: Artist/Année - Album [Label Catno)
+│   │                   # INTERACTIONS : album ; mover ; config
+│   │
+│   ├── mover.py # Création dossiers
+│   │            # Déplacement sécurisé
+│   │            # INTERACTIONS : album ; path_builder ; sorter
+│   │
+│   └── __init__.py
+│
+│
+├── gui/ # INTERFACE GRAPHIQUE
+│   │
+│   ├── main_window.py # Sélection dossiers
+│   │                  # Liste dossiers ignorés
+│   │                  # Bouton «Lancer»
+│   │                  # INTERACTIONS : controllers
+│   │
+│   ├── controllers.py # Traduit les actions utilisateur → appels au Sorter
+│   │                  # INTERACTIONS : main_window ; sorter ; config
+│   │
+│   └── __init__.py
+│
+│
+├── config.py # Configuration globale simple : extensions supportées, valeurs par défaut, dry-run
+│             # INTERACTIONS : controller ; scanner ; album ; path_builder
+│   
+├── main.py
+│   
+└── __init__.py
+
+------------------------------------------------------------------------------------------------------------------
+
+FLUX D APPEL
+
+
+main
+|
+└─> main_window
+    |
+    └─> controller <── config
+        |
+        └─> sorter
+            |
+            └─> scanner <── config
+            |
+            └─> tag_reader
+            |   |
+            |   └─> track
+            |
+            └─> album_builder
+            |   |
+            |   └─> album <── config
+            |
+            └─> metadata_enricher
+            |   |
+            |   └─> discogs_service <── discogs_result
+            |   |
+            |   └─> discogs_matcher <── discogs_result
+            |   |
+            |   └─> discogs_enricher <── discogs_result
+            |   |
+            |   └─> acoustid_service
+            |
+            └─> mover
+                |
+                └─> path_builder <── config
