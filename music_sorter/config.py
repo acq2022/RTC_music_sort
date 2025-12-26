@@ -1,6 +1,6 @@
 from pathlib import Path
 
-SUPPORTED_EXTENSIONS = {".mp3", ".flac", ".ogg", ".m4a"}
+SUPPORTED_EXTENSIONS = {".mp3", ".flac", ".ogg", ".m4a", ".aac", ".aiff", ".dsf", ".opus", ".wav", ".wv"}
 DRY_RUN = True
 
 UNKNOWN_ARTIST = "(0) UNKNOWN ARTIST"
