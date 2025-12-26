@@ -1,6 +1,6 @@
 from services.discogs.discogs_service import DiscogsService
-from services.discogs.discogs_service import DiscogsMatcher
-from services.discogs.discogs_service import DiscogsEnricher
+from services.discogs.discogs_matcher  import DiscogsMatcher
+from services.discogs.discogs_enricher import DiscogsEnricher
 from services.acoustid_service import AcoustIDService
 
 class MetadataEnricher:

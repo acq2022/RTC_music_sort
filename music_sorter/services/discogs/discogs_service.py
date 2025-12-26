@@ -1,7 +1,7 @@
 import logging
 import discogs_client
 from typing import List
-from discogs.discogs_result import DiscogsResult
+from .discogs_result import DiscogsResult
 
 logger = logging.getLogger("DiscogsService")
 
