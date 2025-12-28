@@ -8,7 +8,6 @@ logger = logging.getLogger("DiscogsMatcher")
 class DiscogsMatcher:
 
     def find(self, album, results):
-        print('DiscogsMatcher find')
 
         for release in results:
             try:
@@ -49,74 +48,3 @@ class DiscogsMatcher:
                 return release  # Release trouvée
 
         return None  # Aucune release ne correspond
-
-
-
-
-
-    def findZZZZ(self, album, results):
-        print('DiscogsMatcher find')
-
-        '''for release in results:
-            if not release or not hasattr(release, "tracklist"):
-                continue'''
-        
-        for release in results:
-            # Ignore les releases invalides
-            try:
-                if not release or not hasattr(release, "tracklist"):
-                    continue
-                tracklist = list(release.tracklist)  # force la récupération
-            except Exception as e:
-                print(f"Skipping release due to error: {e}")
-                continue
-
-
-            for track_title in album.tracklist:
-                if not track_title.track_title:
-                    break
-
-                if not any(
-                    t.title
-                    and t.title.lower() == track_title.track_title.lower()
-                    for t in release.tracklist
-                ):
-                    break
-            else:
-                return release  # tous les titres matchent
-
-        return None
-
-
-    def findXXX(self, album, results):
-        print('DiscogsMatcher find')
-        match_release = None
-        for i in range(results.count):
-            release = results[i]
-            if release:
-                for track_title in album.tracklist:
-                    track = next((t for t in release.tracklist if t.title.lower() == track_title.track_title.lower()), None) # Recherche si titres de morceaux similaires
-                    if track:
-                        match_release = release
-                    else:
-                        match_release = None
-                        break
-                    '''if track:
-                        print("discogsMatcher...; album : ", album, type(album))
-                        print("tracklist : ", album.tracklist, type(album.tracklist))
-                        print("1e track : ", album.tracklist[0], type(album.tracklist[0]))
-                        print("title : ", album.tracklist[0].track_title, type(album.tracklist[0].track_title))
-                        print("track_number : ", album.tracklist[0].track_number, type(album.tracklist[0].track_number))
-
-                        print("POSITION : ", album.tracklist.index(track_title))
-                        print("track.position : ", track.position)
-
-
-
-                        if track.position == str(album.index(track_title)): # Recherche si position des morceaux similaires
-                            match_release = release
-                        else:
-                            break'''
-            else:
-                break
-        return match_release

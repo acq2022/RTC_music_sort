@@ -11,7 +11,6 @@ class Track:
         year=None,
         track_number=None,
     ):
-        print("Track init")
         self.path = path
         self.track_title = track_title
         self.track_artist = track_artist

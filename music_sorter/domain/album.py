@@ -3,7 +3,6 @@ from config import VARIOUS_ARTISTS, UNKNOWN_YEAR
 
 class Album:
     def __init__(self, title):
-        print("Album init")
         self.artist = None
         self.year = 'XXXX'
         self.title = title

@@ -7,10 +7,7 @@ logger = logging.getLogger("DiscogsEnricher")
 
 class DiscogsEnricher:
     def apply(self, album: Album, result) -> None:
-        logger.info(
-            f"[Discogs] Applying result {result.id} to '{album.title}'"
-        )
-        print('DiscogsEnricher apply')
+        logger.info(f"[Discogs] Applying result {result.id} to '{album.title}'")
 
         album.artist = result.artists
         album.year = str(result.year)
@@ -21,5 +18,3 @@ class DiscogsEnricher:
         album.catno = label_infos['catno']
 
         album.style = result.styles
-
-        print('DiscogsEnricher apply END')

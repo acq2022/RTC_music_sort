@@ -5,7 +5,6 @@ from services.acoustid_service import AcoustIDService
 
 class MetadataEnricher:
     def __init__(self):
-        print("MetadataEnricher init")
         self.discogs_service = DiscogsService()
         self.discogs_matcher = DiscogsMatcher()
         self.discogs_enricher = DiscogsEnricher()
@@ -19,9 +18,3 @@ class MetadataEnricher:
             if match:
                 match = self.discogs_service.get_main_release(match)
                 self.discogs_enricher.apply(album, match)
-                print("MetadataEnricher enrich_albums END")
-
-    '''def enrich_tracks(self, tracks):
-        for track in tracks:
-            if not track.is_identified:
-                self.acoustid.identify(track)'''

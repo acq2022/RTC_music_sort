@@ -12,7 +12,6 @@ class TagReader:
     def read(self, path: str) -> Track:
         audio = None
         
-        print("TagReader read")
         # mp3 → EasyID3
         if str(path).lower().endswith(".mp3"):
             try:

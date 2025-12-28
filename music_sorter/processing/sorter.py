@@ -10,7 +10,6 @@ logger = logging.getLogger("Sorter")
 
 class Sorter:
     def process(self, source_dir, ignored_dirs=None):
-        print('Sorter process')
         scanner = Scanner()
         tags_reader = TagReader()
         builder = AlbumBuilder()
@@ -24,5 +23,4 @@ class Sorter:
         enricher.enrich_albums(albums)
 
         for album in albums:
-            print("ALBUM in sorter")
             mover.move_album(album, TARGET_ROOT)

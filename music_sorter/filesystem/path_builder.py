@@ -3,11 +3,7 @@ from config import UNKNOWN_ARTIST
 
 class PathBuilder:
     def album_path(self, album, root):
-        print("PathBuilder album_path")
-        print("ALBUM : ", album, type(album))
         artist = self.get_artist_name(album)
-        print("ARIST : ", artist, type(artist))
-        print("FOLDER :", f"{album.year} - {album.title}", type(f"{album.year} - {album.title}"))
         #artist = album.artist or UNKNOWN_ARTIST
         folder = f"{album.year} - {album.title}"
 

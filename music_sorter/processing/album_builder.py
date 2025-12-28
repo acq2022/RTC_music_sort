@@ -3,7 +3,6 @@ from domain.album import Album
 
 class AlbumBuilder:
     def build(self, tracks):
-        print("AlbumBuilder build")
         albums = defaultdict(lambda: Album("Unknown Album"))
 
         for track in tracks:
