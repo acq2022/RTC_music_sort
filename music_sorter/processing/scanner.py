@@ -2,7 +2,9 @@ from pathlib import Path
 from config import SUPPORTED_EXTENSIONS
 
 class Scanner:
+    
     def scan(self, root: Path, ignored_dirs=None):
+        print("Scanner scan")
         ignored_dirs = set(ignored_dirs or [])
         files = []
 

@@ -3,10 +3,11 @@ from domain.album import Album
 
 class AlbumBuilder:
     def build(self, tracks):
+        print("AlbumBuilder build")
         albums = defaultdict(lambda: Album("Unknown Album"))
 
         for track in tracks:
-            title = track.album or "Unknown Album"
+            title = track.album_title or "Unknown Album"
             album = albums[title]
             album.title = title
             album.add_track(track)

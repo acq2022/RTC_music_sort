@@ -6,6 +6,7 @@ from gui.controller import GUIController
 class MainWindow(tk.Tk):
     def __init__(self):
         super().__init__()
+        print('MainWindow')
 
         self.title("Music Sorter")
         self.geometry("600x400")

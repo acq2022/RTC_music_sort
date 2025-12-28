@@ -10,10 +10,16 @@ class Mover:
         self.builder = PathBuilder()
 
     def move_album(self, album, root):
+        print("mover move_album")
         target_dir = self.builder.album_path(album, root)
         target_dir.mkdir(parents=True, exist_ok=True)
+        print("mover move_album ALBUM: ", album)
+        for track in album.tracklist:
+            print("track.path : ", track.path, type(track.path))
+            print("target_dir:", target_dir, type(target_dir))
+            print("track.path:", track.path, type(track.path))
+            print("track.path.name:", track.path.name, type(track.path.name))
 
-        for track in album.tracks:
             dest = target_dir / track.path.name
 
             if DRY_RUN:

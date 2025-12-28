@@ -4,24 +4,23 @@ class Track:
     def __init__(
         self,
         path: Path,
-        title=None,
-        artist=None,
-        album=None,
+        track_title=None,
+        track_artist=None,
+        album_title=None,
         album_artist=None,
         year=None,
         track_number=None,
-        disc_number=None,
     ):
+        print("Track init")
         self.path = path
-        self.title = title
-        self.artist = artist
-        self.album = album
+        self.track_title = track_title
+        self.track_artist = track_artist
+        self.album_title = album_title
         self.album_artist = album_artist
         self.year = year
         self.track_number = track_number
-        self.disc_number = disc_number
 
         self.is_identified = False
 
     def __repr__(self):
-        return f"<Track {self.artist} - {self.title}>"
+        return f"<Track {self.track_artist} - {self.track_number} - {self.track_title}>"

@@ -6,6 +6,7 @@ import config
 
 class GUIController:
     def __init__(self, window):
+        print('GUIController')
         self.window = window
 
     def start_sorting(self):

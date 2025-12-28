@@ -1,46 +1,68 @@
 import logging
 import discogs_client
 from typing import List
-from .discogs_result import DiscogsResult
+#from .discogs_result import DiscogsResult
 
 logger = logging.getLogger("DiscogsService")
 
 class DiscogsService:
-    def __init__(self, user_token: str):
+    def __init__(self):
         self.client = discogs_client.Client(
-            "MusicSorter/1.0",
-            user_token=user_token
+            "MusicSort",
+            user_token="gBvGbGazBqsXgXblCHFqaLSdtctFHXTHPfnFyiSV"
         )
+        print('DiscogsService init')
+    
+    def search_release(self, album):
+        print('DiscogsService search_release')
+        album_artist = album.artist
+        album_title = album.title
+        album_year = album.year
 
-    def search_album(self, album_title: str, artist: str | None) -> List[DiscogsResult]:
-        query = album_title
-        logger.info(f"[Discogs] Search: {query}")
+        params = dict(artist=album_artist, year=album_year, title=album_title)
+        params["type"] = "release"
+        params = {k: v for k, v in params.items() if v}
 
-        results = self.client.search(
-            query,
-            type="release",
-            artist=artist
-        )
+        try:
+            results = self.client.search(**params)
+            if not results:
+                logging.info(f'album non trouvé sur discogs')
+        except Exception as e:
+            logger.debug(f"[Discogs] Skipped result: {e}")
+            return None
+        
+        return results
+    
+    def get_main_releaseXXX(self, release):
+        print('get_main_release')
+        main_release = release
+        master_id = release.data['master_id']
+        master = self.client.master(master_id)
 
-        discogs_results = []
+        if master:
+            main_release_id = master.main_release.id
+            main_release = self.client.release(main_release_id)
 
-        for r in results[:10]:  # limite volontaire
+        return main_release
+    
+    def get_main_release(self, release):
+        print('get_main_release')
+        main_release = release
+
+        master_id = release.data.get('master_id')
+        if not master_id:
+            return main_release
+
+        try:
+            master = self.client.master(master_id)
+        except Exception as e:
+            print(f"Master {master_id} inaccessible : {e}")
+            return main_release
+
+        if master and getattr(master, "main_release", None):
             try:
-                discogs_results.append(
-                    DiscogsResult(
-                        release_id=r.id,
-                        title=r.title,
-                        artist=r.artists[0].name if r.artists else None,
-                        year=r.year,
-                        label=r.labels[0].name if r.labels else None,
-                        catno=r.labels[0].catno if r.labels else None,
-                        formats=[f["name"] for f in r.formats],
-                        track_count=len(r.tracklist) if r.tracklist else None,
-                        styles=r.styles or [],
-                        country=r.country,
-                    )
-                )
+                main_release = self.client.release(master.main_release.id)
             except Exception as e:
-                logger.debug(f"[Discogs] Skipped result: {e}")
+                print(f"Main release inaccessible : {e}")
 
-        return discogs_results
+        return main_release
