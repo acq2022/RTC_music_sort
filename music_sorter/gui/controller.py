@@ -23,15 +23,15 @@ class GUIController:
         # Lancer dans un thread pour éviter le gel de Tkinter
         thread = threading.Thread(
             target=self._run_sorter,
-            args=(Path(source), ignored),
+            args=(Path(source), Path(target), ignored),
             daemon=True,
         )
         thread.start()
 
-    def _run_sorter(self, source, ignored):
+    def _run_sorter(self, source, target, ignored):
         try:
             sorter = Sorter()
-            sorter.process(source, ignored)
+            sorter.process(source, target, ignored)
             self.window.show_info("Tri terminé (ou DRY-RUN terminé).")
         except Exception as e:
             self.window.show_error(str(e))
