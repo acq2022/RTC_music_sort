@@ -9,7 +9,7 @@ class Mover:
     def __init__(self):
         self.builder = PathBuilder()
 
-    def move_album(self, album, root):
+    def move_album(self, album, root, is_moving):
         target_dir = self.builder.album_path(album, root)
         target_dir.mkdir(parents=True, exist_ok=True)
         for track in album.tracklist:
@@ -18,4 +18,9 @@ class Mover:
             if DRY_RUN:
                 logger.info(f"[DRY-RUN] {track.path} → {dest}")
             else:
-                shutil.move(track.path, dest)
+                #shutil.move(track.path, dest)
+
+                if(is_moving):
+                    shutil.move(track.path, dest)
+                else:
+                    shutil.copy(track.path, dest)

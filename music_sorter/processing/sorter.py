@@ -9,7 +9,7 @@ from config import TARGET_ROOT
 logger = logging.getLogger("Sorter")
 
 class Sorter:
-    def process(self, source_dir, target_dir, ignored_dirs=None):
+    def process(self, source_dir, target_dir, ignored_dirs=None, is_moving=False):
         scanner = Scanner()
         tags_reader = TagReader()
         builder = AlbumBuilder()
@@ -23,4 +23,4 @@ class Sorter:
         enricher.enrich_albums(albums)
 
         for album in albums:
-            mover.move_album(album, target_dir)
+            mover.move_album(album, target_dir, is_moving)

@@ -35,6 +35,11 @@ class MainWindow(tk.Tk):
         self.ignore_text = tk.Text(self, height=5, width=70)
         self.ignore_text.pack(padx=10)
 
+        # Selection 'copy' or 'move'
+        self.is_moving_var = tk.BooleanVar(value=False)
+        tk.Radiobutton(self, text="copy", value=False, variable=self.is_moving_var).pack(side="left", padx=5)
+        tk.Radiobutton(self, text="move", value=True, variable=self.is_moving_var).pack(side="left", padx=5)
+
         # Start button
         tk.Button(
             self,
