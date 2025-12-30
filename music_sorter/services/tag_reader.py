@@ -2,7 +2,7 @@ import logging
 from mutagen import File
 from mutagen.easyid3 import EasyID3
 from mutagen.id3 import ID3NoHeaderError
-
+from utils.parser import Parser
 from domain.track import Track
 
 logger = logging.getLogger("TagReader")
@@ -31,22 +31,32 @@ class TagReader:
         # Aucun tag
         if audio is None:
             return Track(path=path)
-
+        
         def get(tag):
             value = audio.get(tag)
             return value[0] if value else None
+        
+        total_tracks = get("totaltracks") or get("tracktotal") or get("trackc")
+        if not total_tracks:
+            total_tracks = Parser.extract_second_part(get("tracknumber")) or Parser.extract_second_part(get("track"))
 
         return Track(
             path=path,
-            track_title=get("title"),
-            track_artist=get("artist"),
-            album_title=get("album"),
-            album_artist=get("albumartist"),
-            year=get("date"),
-            track_number=self._normalize_number(get("tracknumber")),
+            album_artists = [get("albumartist")] or [get("album_artists")] or [get("album artist")],
+            track_artists = [get("artist")] or [get("artists")],
+            year = Parser.extract_year(get("date")) or Parser.extract_year(get("year")),
+            album_title = get("album"),
+            label = get("organization") or get("label"),
+            catno = get("catalognumber"),
+            track_number = Parser.extract_first_part(get("tracknumber")) or Parser.extract_first_part(get("track")),
+            total_tracks = total_tracks,
+            track_title = get("title"),
+            duration = str(audio.info.length) if audio and hasattr(audio, "info") and hasattr(audio.info, "length") else get("length"),
+            genre = [get("genre")],
+            bpm = get("bpm"),
+            website = get("website"),
+            disc_number = get("discnumber"),
+            original_date = get("originaldate"),
+            release_country = get("releasecountry"),
+            language = get("language"),
         )
-    
-    @staticmethod
-    # ex: "3/12" → "3"
-    def _normalize_number(value):
-        return value.split("/")[0] if value else None

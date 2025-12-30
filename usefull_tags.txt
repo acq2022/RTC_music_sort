@@ -1,0 +1,21 @@
+EasyID3                     FLAC                                                            FORMAT                          NOTES
+
+    'albumartist',              'albumartist' ou 'album_artists' ou 'album artist'              []
+    'artist',                   'artist' ou 'artists'                                           []                              = track_artist 
+    'date',                     'date' ? ou 'year' ou "DATE" ?                                  XXXX-XX-XX -> XXXX              = album_title
+    'album',                    'album'                                          
+    'organization',             'label'                                                         
+    'catalognumber',            'catalognumber'                                                 
+    'tracknumber',              'tracknumber' ou 'track'                                        X/Y -> X
+    totaltracks,                'totaltracks' ou 'tracktotal' ou 'trackc'                       X/Y -> Y
+    'title',                    'title'
+    'length',                   durée
+    bitrate,                    bitrate
+    'genre',                    'genre'                                                         []
+    'bpm',                      'bpm'
+    'website',                  web
+    'discnumber',               'discnumber'                                                                                    si plusieurs cd pr 1 album
+    'originaldate',             'originaldate'  
+    'releasecountry',           'releasecountry'
+    'language',                 'language'
+    'isrc'                      'isrc'

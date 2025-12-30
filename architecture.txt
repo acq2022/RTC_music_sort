@@ -44,7 +44,7 @@ music_sorter/
 │   ├── tag_reader.py # Lit les tags audio avec mutagen
 │   │                 # Convertit un fichier → track
 │   │                 # Gère les fichiers sans tags ou non supportés
-│   │                 # INTERACTIONS : track ; sorter ; mutagen (API)
+│   │                 # INTERACTIONS : track ; sorter ; mutagen (API) ; parser
 │   │
 │   ├── acoustid_service.py # Génère une empreinte Chromaprint
 │   │                       # (= Shazam) Dernier recours avec acoustID (API)
@@ -102,6 +102,15 @@ music_sorter/
 │   └── __init__.py
 │
 │
+├── utils/ # FONCTIONS UTILITAIRES GENERIQUES
+│   │
+│   ├── parser.py # Parser dates (xxxx-xx-xx -> xxxx)
+│   │             # Parser tracknumber ou totaltrack (x/y -> x ou y)
+│   │            # INTERACTIONS : tag_reader
+│   │
+│   └── __init__.py
+│
+│
 ├── config.py # Configuration globale simple : extensions supportées, valeurs par défaut, dry-run
 │             # INTERACTIONS : controller ; scanner ; album ; path_builder
 │   
@@ -124,7 +133,7 @@ main
             |
             └─> scanner <── config
             |
-            └─> tag_reader
+            └─> tag_reader <── parser
             |   |
             |   └─> track
             |
