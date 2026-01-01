@@ -46,7 +46,11 @@ class Album:
             for artist in track.artists
         }
 
-        normalized = {Parser.join_normalized_terms(artist) for artist in artists}
+        normalized = {
+            Parser.join_normalized_terms(artist) 
+            for artist in artists
+            if artist
+        }
         
         artist = next(iter(normalized)) if len(normalized) == 1 else VARIOUS_ARTISTS
         
@@ -69,7 +73,9 @@ class Album:
             for track in self.tracklist 
             if track.genre 
             for genre_list in track.genre
+            if genre_list
             for genre in genre_list
+            if genre
         }
         self.style = sorted(style)
 

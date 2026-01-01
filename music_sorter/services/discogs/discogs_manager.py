@@ -24,12 +24,20 @@ class DiscogsManager:
             dict(artist=artist, release_title=album_title, year=album_year, track=track),
             dict(release_title=album_title, year=album_year, track=track)
         ]
+
         for params in search_attempts:
-            params = {k: v for k, v in params.items() if v} # ne conserve que les clés dont la valeur est True
+            params = {k: v for k, v in params.items() if v} # filtre les valeurs vides
 
             results = self.discogs_service.search(params)
+
+            if not results:
+                logger.info(f"[Discogs] Aucun résultat pour {params}")
+                continue
             
             for result in results:
+                if not result:
+                    continue
+
                 try:
                     main_release = self.resolve_main_release(result)
                     if not main_release:
@@ -41,7 +49,7 @@ class DiscogsManager:
                         break
 
                 except Exception as e:
-                    logger.warning(f"[Discogs] {e}")
+                    logger.warning(f"[Discogs] Erreur avec un résultat: {e}")
                     break
 
 

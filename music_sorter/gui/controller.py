@@ -2,6 +2,7 @@ import threading
 from pathlib import Path
 from processing.sorter import Sorter
 import config
+import traceback  # <-- pour afficher les tracebacks
 
 
 class GUIController:
@@ -18,24 +19,37 @@ class GUIController:
             self.window.show_error("Veuillez sélectionner les dossiers source et cible.")
             return
 
-        # Met à jour la config globale (simple et efficace ici)
+        # Met à jour la config globale
         config.TARGET_ROOT = Path(target)
 
         # Lancer dans un thread pour éviter le gel de Tkinter
         thread = threading.Thread(
-            target=self._run_sorter,
+            target=self._thread_wrapper,
             args=(Path(source), Path(target), ignored, is_moving),
             daemon=True,
         )
         thread.start()
 
-    def _run_sorter(self, source, target, ignored, is_moving):
+    def _thread_wrapper(self, source, target, ignored, is_moving):
+        """
+        Wrapper pour exécuter le tri dans un thread et afficher
+        correctement toutes les exceptions dans le terminal VS Code.
+        """
         try:
-            sorter = Sorter()
-            sorter.process(source, target, ignored, is_moving)
-            self.window.show_info("Tri terminé (ou DRY-RUN terminé).")
-        except Exception as e:
-            self.window.show_error(str(e))
+            self._run_sorter(source, target, ignored, is_moving)
+        except Exception:
+            # Affiche le traceback complet dans le terminal VS Code
+            traceback.print_exc()
+            # Affiche un message générique à l'utilisateur
+            self.window.show_error("Une erreur est survenue. Consultez le terminal pour plus de détails.")
+
+    def _run_sorter(self, source, target, ignored, is_moving):
+        """
+        Exécution réelle du tri.
+        """
+        sorter = Sorter()
+        sorter.process(source, target, ignored, is_moving)
+        self.window.show_info("Tri terminé (ou DRY-RUN terminé).")
 
     def _get_ignored_dirs(self):
         text = self.window.ignore_text.get("1.0", "end").strip()

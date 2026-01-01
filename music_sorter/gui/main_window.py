@@ -6,13 +6,21 @@ from gui.controller import GUIController
 
 
 def tk_exception_handler(exc, val, tb):
-        traceback.print_exception(exc, val, tb, file=sys.stderr)
+    """
+    Handler global pour toutes les exceptions Tkinter
+    - Affiche le traceback complet dans le terminal
+    - Permet de debuguer facilement dans VS Code
+    """
+    traceback.print_exception(exc, val, tb, file=sys.stderr)
+    # Optionnel : affiche aussi un popup générique à l'utilisateur
+    # messagebox.showerror("Erreur", "Une erreur est survenue. Consultez le terminal pour plus de détails.")
 
 
 class MainWindow(tk.Tk):
     def __init__(self):
         super().__init__()
 
+        # 🔹 Attache le handler global
         self.report_callback_exception = tk_exception_handler
 
         self.title("Music Sorter")
@@ -58,6 +66,7 @@ class MainWindow(tk.Tk):
             height=2,
         ).pack(pady=20)
 
+    # ─────────────── Sélecteurs de dossier ───────────────
     def select_source(self):
         path = filedialog.askdirectory()
         if path:
@@ -68,12 +77,19 @@ class MainWindow(tk.Tk):
         if path:
             self.target_var.set(path)
 
+    # ─────────────── Lancer le tri ───────────────
     def start_sorting(self):
+        """
+        Lancement du tri via le controller
+        - Toutes les exceptions dans le main thread Tk sont capturées par tk_exception_handler
+        """
         self.controller.start_sorting()
 
+    # ─────────────── Popups utilisateur ───────────────
     def show_error(self, message):
+        """Afficher un message d'erreur pour l'utilisateur"""
         messagebox.showerror("Erreur", message)
 
     def show_info(self, message):
+        """Afficher un message d'information pour l'utilisateur"""
         messagebox.showinfo("Information", message)
-    
