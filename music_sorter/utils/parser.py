@@ -1,11 +1,12 @@
 class Parser:
-    
+
     @staticmethod
     def nettoyer(valeur) -> str | None:
         if not valeur or not isinstance(valeur, str):
             return None
         valeur = valeur.strip()
         return valeur or None
+    
 
     @staticmethod
     def pipeline(valeur, *etapes):
@@ -14,6 +15,7 @@ class Parser:
                 return None
             valeur = etape(valeur)
         return valeur
+    
 
     @staticmethod
     def extract_first_part(valeur: str) -> str | None:
@@ -22,6 +24,7 @@ class Parser:
             Parser.nettoyer,
             Parser.extraire_partie(0, retourner_si_absent=True)
         )
+    
 
     @staticmethod
     def extract_second_part(valeur: str) -> str | None:
@@ -30,6 +33,7 @@ class Parser:
             Parser.nettoyer,
             Parser.extraire_partie(1)
         )
+    
 
     @staticmethod
     def extraire_partie(index: int, separateurs=("/", "-"), retourner_si_absent: bool = False):
@@ -40,6 +44,7 @@ class Parser:
                     return parties[index] if index < len(parties) else None
             return valeur if retourner_si_absent and index == 0 else None
         return etape
+    
 
     @staticmethod
     def extract_year(date_str):
@@ -72,3 +77,45 @@ class Parser:
             Parser.nettoyer,
             lambda v: tenter(annee_par_datetime, annee_par_regex)
         )
+    
+    
+    @staticmethod
+    def normalize_artist(name: str) -> str:
+        return (
+            name.strip()
+                .lower()
+                .replace("_", " ")
+        )
+
+
+    @staticmethod
+    def join_normalized_terms(txt_in: str) -> str:
+        import re
+        s = txt_in.lower()                                          # passage en minuscule
+        s = s.replace("-", " ")                                     # remplace les tirets
+        s = re.sub(r"\s*(?:&|,|\band\b|\+)\s*", ",", s)             # remplace les & , and + par une virgule 
+        s = re.sub(r"\s+", " ", s)                                  # évite les espaces multiples ("a   b" → "a b")
+        txt_out = [a.strip() for a in s.split(",") if a.strip()]    # découpe sur les virgules, enlève les espaces en trop, supprime les éléments vides ("a,b,, c " → ["a", "b", "c"])
+        txt_out.sort()                                              # tri alphabétique
+        return " & ".join(txt_out)
+    
+
+    # Nettoie une chaîne pour l'utiliser comme nom de fichier ou dossier
+    @staticmethod
+    def sanitize_path(name, replacement="_", max_length=255):
+        import re
+        import unicodedata
+        from config import WINDOWS_RESERVED_NAMES, INVALID_CHARS, UNKNOWN_FOLDER     
+        if name is None:
+            return UNKNOWN_FOLDER     
+        name = str(name)                                                        # Conversion explicite en str
+        name = unicodedata.normalize("NFKD", name)                              # Normalisation Unicode (é → e, etc.)
+        name = "".join(c for c in name if not unicodedata.combining(c))      
+        name = re.sub(INVALID_CHARS, replacement, name)                         # Suppression des caractères interdits      
+        name = re.sub(r"\s+", " ", name)                                        # Suppression des espaces multiples      
+        name = name.strip(" .")                                                 # Trim espaces et points (Windows)
+        if name.upper() in WINDOWS_RESERVED_NAMES:                              # Éviter les noms réservés Windows
+            name = f"_{name}"
+        if len(name) > max_length:                                              # Longueur maximale (sécurité)
+            name = name[:max_length].rstrip(" .")
+        return name or "Unknown"

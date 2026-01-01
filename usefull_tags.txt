@@ -1,7 +1,7 @@
 EasyID3                     FLAC                                                            FORMAT                          NOTES
 
     'albumartist',              'albumartist' ou 'album_artists' ou 'album artist'              []
-    'artist',                   'artist' ou 'artists'                                           []                              = track_artist 
+    'artist',                   'artist' ou 'artists'                                           []                              = track_artists 
     'date',                     'date' ? ou 'year' ou "DATE" ?                                  XXXX-XX-XX -> XXXX              = album_title
     'album',                    'album'                                          
     'organization',             'label'                                                         

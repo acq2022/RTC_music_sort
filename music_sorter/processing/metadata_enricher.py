@@ -1,3 +1,4 @@
+from services.discogs.discogs_manager import DiscogsManager
 from services.discogs.discogs_service import DiscogsService
 from services.discogs.discogs_matcher  import DiscogsMatcher
 from services.discogs.discogs_enricher import DiscogsEnricher
@@ -5,6 +6,7 @@ from services.acoustid_service import AcoustIDService
 
 class MetadataEnricher:
     def __init__(self):
+        self.discogs_manager = DiscogsManager()
         self.discogs_service = DiscogsService()
         self.discogs_matcher = DiscogsMatcher()
         self.discogs_enricher = DiscogsEnricher()
@@ -12,14 +14,4 @@ class MetadataEnricher:
     
     def enrich_albums(self, albums):
         for album in albums:
-            print("MetadataEnricher album : ", album)
-            results = self.discogs_service.search_release(album)
-            print("MetadataEnricher results : ", results)
-            match = self.discogs_matcher.find(album, results)
-            print("MetadataEnricher match : ", match)
-
-            if match:
-                match = self.discogs_service.get_main_release(match)
-                print("MetadataEnricher get_main_release : ", match)
-                self.discogs_enricher.apply(album, match)
-            print("")
+            self.discogs_manager.apply(album)

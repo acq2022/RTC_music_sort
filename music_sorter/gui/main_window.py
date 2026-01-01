@@ -1,11 +1,19 @@
 import tkinter as tk
+import sys
+import traceback
 from tkinter import filedialog, messagebox
 from gui.controller import GUIController
+
+
+def tk_exception_handler(exc, val, tb):
+        traceback.print_exception(exc, val, tb, file=sys.stderr)
 
 
 class MainWindow(tk.Tk):
     def __init__(self):
         super().__init__()
+
+        self.report_callback_exception = tk_exception_handler
 
         self.title("Music Sorter")
         self.geometry("600x400")
@@ -68,3 +76,4 @@ class MainWindow(tk.Tk):
 
     def show_info(self, message):
         messagebox.showinfo("Information", message)
+    

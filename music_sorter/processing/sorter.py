@@ -18,7 +18,6 @@ class Sorter:
 
         paths = scanner.scan(source_dir, ignored_dirs)
         tracks = [tags_reader.read(p) for p in paths]
-        print("tracks :", tracks)
         albums = builder.build(tracks)
 
         enricher.enrich_albums(albums)
