@@ -4,7 +4,7 @@ from domain.album import Album
 
 logger = logging.getLogger("DiscogsEnricher")
 
-# TOTO : paufiner le remplissage (+ de paramètres à remplir dans Album)
+# TODO : paufiner le remplissage (+ de paramètres à remplir dans Album)
 class DiscogsEnricher:
     def apply(self, album: Album, result) -> None:
         logger.info(f"[Discogs] Applying result {result.id} to '{album.title}'")
@@ -13,8 +13,14 @@ class DiscogsEnricher:
         album.year = result.year
         album.title = result.title
 
-        label_infos = result.data['labels'][0]
-        album.label = label_infos['name']
-        album.catno = label_infos['catno']
+        label_infos = result.data["labels"][0]
 
+        def clean(value):
+            if value is None or value.lower() == "none":
+                return None
+            return value
+        
+        album.label = clean(label_infos.get("name"))
+        album.catno = clean(label_infos.get("catno"))
+        
         album.style = result.styles

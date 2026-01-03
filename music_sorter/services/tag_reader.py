@@ -34,7 +34,14 @@ class TagReader:
         
         def get(tag):
             value = audio.get(tag)
-            return value[0] if value else None
+            if not value:
+                return None
+            v=value[0]
+            if v is None:
+                return None
+            if isinstance(v, str):
+                v=v.strip()
+            return v
         
         total_tracks = get("totaltracks") or get("tracktotal") or get("trackc")
         if not total_tracks:

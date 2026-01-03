@@ -86,6 +86,33 @@ class Parser:
                 .lower()
                 .replace("_", " ")
         )
+    
+
+    @staticmethod
+    def normalize_track_number(value: str | None) -> str | None:
+        import re
+        if not value:
+            return None
+
+        value = str(value).strip()
+        
+        # Recherche un pattern disque-piste : "1-1", "2/3", "1.04", ou juste "1"
+        match = re.match(r"(\d+)([-/.])?(\d+)?", value)
+        if match:
+            first = match.group(1)      # disque ou premier nombre
+            sep = match.group(2) or ""  # séparateur ou vide
+            second = match.group(3)     # piste
+
+            # Si second existe, on le met sur 2 chiffres
+            if second and second.isdigit():
+                second = f"{int(second):02d}"
+                return f"{first}{sep}{second}"
+
+            # Sinon, on met first sur 2 chiffres
+            return f"{int(first):02d}"
+
+        return value
+
 
 
     @staticmethod
@@ -119,3 +146,14 @@ class Parser:
         if len(name) > max_length:                                              # Longueur maximale (sécurité)
             name = name[:max_length].rstrip(" .")
         return name or "Unknown"
+    
+
+    @staticmethod
+    def sanitize_name(name: str) -> str:
+        import re
+        from config import UNKNOWN_FOLDER
+        if not name:
+            return UNKNOWN_FOLDER
+        name = name.strip()   # CRUCIAL
+        name = re.sub(r'[<>:"/\\|?*]', "_", name)
+        return name

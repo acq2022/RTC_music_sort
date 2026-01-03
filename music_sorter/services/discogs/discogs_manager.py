@@ -1,4 +1,5 @@
 import logging
+import time
 from .discogs_service import DiscogsService
 from .discogs_matcher  import DiscogsMatcher
 from .discogs_enricher import DiscogsEnricher
@@ -50,6 +51,7 @@ class DiscogsManager:
 
                 except Exception as e:
                     logger.warning(f"[Discogs] Erreur avec un résultat: {e}")
+                    time.sleep(60)
                     break
 
 
