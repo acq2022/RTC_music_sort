@@ -149,11 +149,21 @@ class Parser:
     
 
     @staticmethod
-    def sanitize_name(name: str) -> str:
+    def sanitize_name(name: str | None) -> str:
         import re
         from config import UNKNOWN_FOLDER
         if not name:
             return UNKNOWN_FOLDER
+        name = name.strip()   # CRUCIAL
+        name = re.sub(r'[<>:"/\\|?*]', "_", name)
+        return name
+    
+    
+    @staticmethod
+    def sanitize_track_title_name(name: str | None) -> str | None:
+        import re
+        if not name:
+            return None
         name = name.strip()   # CRUCIAL
         name = re.sub(r'[<>:"/\\|?*]', "_", name)
         return name

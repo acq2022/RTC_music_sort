@@ -41,6 +41,13 @@ class PathBuilder:
 
     def get_track_name(self, track):
         track_number = Parser.normalize_track_number(track.track_number)
-        track_title = Parser.sanitize_name(track.title).title()
+        track_title = Parser.sanitize_track_title_name(track.title)
+        if track_title:
+            track_title = track_title.title()
+        else:
+            track_title = track.path.stem
         track_format = track.path.suffix.lower()
-        return f"{track_number} - {track_title}{track_format}"
+        if track_number:
+            return f"{track_number} - {track_title}{track_format}"
+        else:
+            return f"{track_title}{track_format}"
