@@ -167,3 +167,59 @@ class Parser:
         name = name.strip()   # CRUCIAL
         name = re.sub(r'[<>:"/\\|?*]', "_", name)
         return name
+    
+
+    @staticmethod
+    def _hash_fichier(path, chunk_size=8192):    
+        import hashlib
+        h = hashlib.sha256()    # Retourne le hash SHA-256 du fichier
+        with open(path, "rb") as f:
+            for chunk in iter(lambda: f.read(chunk_size), b""):
+                h.update(chunk)
+        return h.hexdigest()
+
+    @staticmethod
+    def deplacer_fichier_sans_doublon(src_path: str, dst_path: str, is_moving: bool) -> str:
+        import os
+        import shutil
+        
+        if not os.path.isfile(src_path):
+            return "erreur"
+
+        dst_dir = os.path.dirname(dst_path)
+        os.makedirs(dst_dir, exist_ok=True)
+
+        src_size = os.path.getsize(src_path)
+        src_hash = None
+
+        # recherche de doublon par contenu
+        for name in os.listdir(dst_dir):
+            candidate = os.path.join(dst_dir, name)
+
+            if not os.path.isfile(candidate):
+                continue
+
+            if os.path.getsize(candidate) != src_size:
+                continue
+
+            if src_hash is None:
+                src_hash = Parser._hash_fichier(src_path)
+
+            # doublon réel → renommage STRICT
+            if Parser._hash_fichier(candidate) == src_hash:
+                if candidate != dst_path:
+                    os.replace(candidate, dst_path)
+
+                if is_moving:
+                    os.remove(src_path)
+
+                return "renommé"
+
+        # aucun doublon → transfert normal
+        if is_moving:
+            os.replace(src_path, dst_path)
+        else:
+            shutil.copy2(src_path, dst_path)
+
+        return "transféré"
+        

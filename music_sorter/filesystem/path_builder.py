@@ -39,7 +39,7 @@ class PathBuilder:
         return str(album.artist).title() if album.artist else UNKNOWN_ARTIST
     
 
-    def get_track_name(self, track):
+    def get_track_path(self, track):
         track_number = Parser.normalize_track_number(track.track_number)
         track_title = Parser.sanitize_track_title_name(track.title)
         if track_title:

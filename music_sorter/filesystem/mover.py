@@ -1,6 +1,7 @@
 import shutil
 import logging
 from filesystem.path_builder import PathBuilder
+from utils.parser import Parser
 from config import DRY_RUN
 
 logger = logging.getLogger("Mover")
@@ -14,15 +15,12 @@ class Mover:
         target_dir.mkdir(parents=True, exist_ok=True)
         for track in album.tracklist:
             try:
-                track_name = self.builder.get_track_name(track)
-                dest = target_dir / track_name
+                track_path = self.builder.get_track_path(track)
+                dest_path = target_dir / track_path
 
                 if DRY_RUN:
-                    logger.info(f"[DRY-RUN] {track.path} → {dest}")
+                    logger.info(f"[DRY-RUN] {track.path} → {dest_path}")
                 else:
-                    if(is_moving):
-                        shutil.move(track.path, dest)
-                    else:
-                        shutil.copy(track.path, dest)
+                    logger.info(f"{track.path} {Parser.deplacer_fichier_sans_doublon(track.path, dest_path, is_moving)} {dest_path}")
             except Exception as e:
-                logger.warning(f"[MOVE ERROR] {track.path} → {dest} : {e}")
+                logger.warning(f"[MOVE ERROR] {track.path} → {dest_path} : {e}")
