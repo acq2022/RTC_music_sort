@@ -1,5 +1,5 @@
 from collections import Counter
-from config import VARIOUS_ARTISTS, VARIOUS_ALIASES
+from config import VARIOUS_ARTISTS, VARIOUS_ALIASES, UNKNOWN_ALBUM, UNKNOWN_YEAR
 from utils.parser import Parser
 
 class Album:
@@ -40,6 +40,7 @@ class Album:
         self.tracklist.append(track)
 
     def finalize(self):
+        print("#Album 1 : ", self.artists, " - ", self.title, " - ", self.year, type(self.year))
         artists = {
             artist
             for track in self.tracklist
@@ -60,12 +61,22 @@ class Album:
             else artist
         ]
 
+        def _get_year(self):
+            values = [getattr(track, "year") for track in self.tracklist if getattr(track, "year")]
+            if values:
+                if self.artists[0] == VARIOUS_ARTISTS and self.title == UNKNOWN_ALBUM:
+                    return UNKNOWN_YEAR
+                else:
+                    return Counter(values).most_common(1)[0][0]
+        
+        self.year = _get_year(self)
+
         def _set_var(self, var_name: str):
             values = [getattr(track, var_name) for track in self.tracklist if getattr(track, var_name)]
             if values:
                 setattr(self, var_name, Counter(values).most_common(1)[0][0])
 
-        for attr in ["year", "label", "catno", "total_tracks", "website", "disc_number", "original_date", "release_country", "language"]:
+        for attr in ["label", "catno", "total_tracks", "website", "disc_number", "original_date", "release_country", "language"]:
             _set_var(self, attr)
         
         style = {
@@ -78,6 +89,8 @@ class Album:
             if genre
         }
         self.style = sorted(style)
+
+        print("#Album 2 : ", self.artists, " - ", self.title, " - ", self.year, type(self.year))
 
 
     def __repr__(self):
