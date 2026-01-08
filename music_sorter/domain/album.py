@@ -40,7 +40,6 @@ class Album:
         self.tracklist.append(track)
 
     def finalize(self):
-        print("#Album 1 : ", self.artists, " - ", self.title, " - ", self.year, type(self.year))
         artists = {
             artist
             for track in self.tracklist
@@ -89,8 +88,6 @@ class Album:
             if genre
         }
         self.style = sorted(style)
-
-        print("#Album 2 : ", self.artists, " - ", self.title, " - ", self.year, type(self.year))
 
 
     def __repr__(self):
