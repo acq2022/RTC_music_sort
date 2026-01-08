@@ -13,10 +13,6 @@ VARIOUS_ALIASES = {"various", "various artist", "various artists", "va", "v-a", 
 
 TARGET_ROOT = Path("sorted_music")
 
-USER_AGENT = "MusicSort"
-USER_TOKEN = "gBvGbGazBqsXgXblCHFqaLSdtctFHXTHPfnFyiSV"
-
-
 WINDOWS_RESERVED_NAMES = {
     "CON", "PRN", "AUX", "NUL",
     *(f"COM{i}" for i in range(1, 10)),

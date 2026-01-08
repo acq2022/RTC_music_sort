@@ -1,10 +1,17 @@
 import logging
+import os
 import time
 import discogs_client
-from typing import List
-from config import USER_AGENT, USER_TOKEN
 
 logger = logging.getLogger("DiscogsService")
+
+USER_AGENT = os.getenv("USER_AGENT")
+if not USER_AGENT:
+            raise RuntimeError("USER_AGENT discogs manquant. Mets-la dans la variable d'environnement USER_AGENT.")
+USER_TOKEN = os.getenv("USER_TOKEN")
+if not USER_TOKEN:
+            raise RuntimeError("USER_TOKEN discogs manquant. Mets-la dans la variable d'environnement USER_TOKEN.")
+
 
 class DiscogsService:
     MIN_INTERVAL = 1.0  # secondes entre chaque requête
@@ -12,6 +19,11 @@ class DiscogsService:
 
     def __init__(self):
         self.client = discogs_client.Client(USER_AGENT, user_token=USER_TOKEN)
+
+
+        ACOUSTID_API_KEY = os.getenv("ACOUSTID_API_KEY")
+        if not ACOUSTID_API_KEY:
+            raise RuntimeError("Clé API AcoustID manquante. Mets-la dans la variable d'environnement ACOUSTID_API_KEY.")
 
     
     def _throttle(self):
