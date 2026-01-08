@@ -41,7 +41,7 @@ music_sorter/
 │   |   └── __init__.py
 │   │
 │   │
-│   ├── tag_reader.py # Lit les tags audio avec mutagen
+│   ├── tags_reader.py # Lit les tags audio avec mutagen
 │   │                 # Convertit un fichier → track
 │   │                 # Gère les fichiers sans tags ou non supportés
 │   │                 # INTERACTIONS : track ; sorter ; mutagen (API) ; parser
@@ -60,14 +60,20 @@ music_sorter/
 │   │              # Sélectionner fichier à traiter
 │   │              # INTERACTIONS : sorter ; config
 │   │
+│   ├── track_builder.py # Groupe les morceaux en album
+│   │                    # Gère les albums inconnus
+│   │                    # Détection compilation
+│   │                    # Définit l'album_artist et l'année
+│   │                    # INTERACTIONS : tags_reader ; acoustid_service ; track ; sorter
+│   │
 │   ├── album_builder.py # Groupe les morceaux en album
 │   │                    # Gère les albums inconnus
 │   │                    # Détection compilation
 │   │                    # Définit l'album_artist et l'année
-│   │                    # INTERACTIONS : track ; album ; sorter
+│   │                    # INTERACTIONS : tags_reader ; track ; album ; sorter
 │   │
-│   ├── metadata_enricher.py # Orchestre l'enrichissement des métadonnées. Ordre: discogs, acoustID, discogs à nouveau
-│   │                        # INTERACTIONS : album ; track ; discogs_service ; discogs_matcher ; discogs_enricher ; acoustId_service ; sorter
+│   ├── metadata_enricher.py # Orchestre l'enrichissement des métadonnées
+│   │                        # INTERACTIONS : album ; track ; discogs_service ; discogs_matcher ; discogs_enricher ; sorter
 │   │
 │   ├── sorter.py # Chef d’orchestre: appelle tout 
 │   │             # Aucune logique métier lourde/détaillée
@@ -133,7 +139,11 @@ main
             |
             └─> scanner <── config
             |
-            └─> tag_reader <── parser
+            └─> track_builder
+            |   |
+            |   └─> tags_reader <── parser
+            |   |
+            |   └─> acoustid_service <── parser (TODO)
             |   |
             |   └─> track
             |
@@ -143,13 +153,13 @@ main
             |
             └─> metadata_enricher
             |   |
-            |   └─> acoustid_service 
-            |   |
-            |   └─> discogs_service <── discogs_result
-            |   |
-            |   └─> discogs_matcher <── discogs_result
-            |   |
-            |   └─> discogs_enricher <── discogs_result
+            |   └─> discogs_manager 
+            |       |
+            |       └─> discogs_service <── discogs_result
+            |       |
+            |       └─> discogs_matcher <── discogs_result
+            |       |
+            |       └─> discogs_enricher <── discogs_result
             |
             └─> mover
                 |
