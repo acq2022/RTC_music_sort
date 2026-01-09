@@ -67,25 +67,25 @@ class MainWindow(tk.Tk):
 
         tk.Checkbutton(
             options_frame,
-            text="Aliases (hardlinks de tous les alias d’artistes)",
+            text="Aliases (ajoute les alias des artistes - hardlinks)",
             variable=self.aliases_var,
         ).pack(anchor="w")
 
         tk.Checkbutton(
             options_frame,
-            text="Styles (classement par styles)",
+            text="Styles (classement par styles - hardlinks)",
             variable=self.styles_var,
         ).pack(anchor="w")
 
         tk.Checkbutton(
             options_frame,
-            text="Decades (classement par décennies)",
+            text="Decades (classement par décennies - hardlinks)",
             variable=self.decades_var,
         ).pack(anchor="w")
 
         tk.Checkbutton(
             options_frame,
-            text="Labels (classement par labels)",
+            text="Labels (classement par labels - hardlinks)",
             variable=self.labels_var,
         ).pack(anchor="w")
 
@@ -110,7 +110,7 @@ class MainWindow(tk.Tk):
 
         self.selections_label = tk.Label(
             options_frame,
-            text="Noms de dossiers séparés par des virgules",
+            text="Noms de dossiers (séparés par des virgules)",
             fg="gray",
         )
         self.selections_label.pack(anchor="w", padx=TEXT_PADX)
@@ -136,7 +136,7 @@ class MainWindow(tk.Tk):
 
         self.ignore_label = tk.Label(
             options_frame,
-            text="Dossiers séparés par des virgules",
+            text="Noms de dossiers (séparés par des virgules)",
             fg="gray",
         )
         self.ignore_label.pack(anchor="w", padx=TEXT_PADX)
