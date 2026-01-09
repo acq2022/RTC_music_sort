@@ -6,67 +6,211 @@ from gui.controller import GUIController
 
 
 def tk_exception_handler(exc, val, tb):
-    """
-    Handler global pour toutes les exceptions Tkinter
-    - Affiche le traceback complet dans le terminal
-    - Permet de debuguer facilement dans VS Code
-    """
     traceback.print_exception(exc, val, tb, file=sys.stderr)
-    # Optionnel : affiche aussi un popup générique à l'utilisateur
-    # messagebox.showerror("Erreur", "Une erreur est survenue. Consultez le terminal pour plus de détails.")
 
 
 class MainWindow(tk.Tk):
     def __init__(self):
         super().__init__()
 
-        # 🔹 Attache le handler global
         self.report_callback_exception = tk_exception_handler
 
         self.title("Music Sorter")
-        self.geometry("600x400")
+        self.geometry("600x760")
         self.resizable(False, False)
 
         self.controller = GUIController(self)
 
+        # ─────────────── Variables ───────────────
+        self.source_var = tk.StringVar()
+        self.target_var = tk.StringVar()
+
+        self.is_moving_var = tk.BooleanVar(value=False)
+
+        self.aliases_var = tk.BooleanVar(value=False)
+        self.styles_var = tk.BooleanVar(value=False)
+        self.decades_var = tk.BooleanVar(value=False)
+        self.labels_var = tk.BooleanVar(value=False)
+
+        self.selections_var = tk.BooleanVar(value=False)
+        self.ignore_var = tk.BooleanVar(value=False)
+
         self._build_ui()
 
+    # ─────────────────────────────────────────────
+    # UI
+    # ─────────────────────────────────────────────
     def _build_ui(self):
-        # Source folder
-        tk.Label(self, text="Dossier source").pack(anchor="w", padx=10, pady=(10, 0))
-        self.source_var = tk.StringVar()
-        tk.Entry(self, textvariable=self.source_var, width=70).pack(padx=10)
-        tk.Button(self, text="Parcourir", command=self.select_source).pack(pady=5)
+        TEXT_WIDTH = 68
+        TEXT_HEIGHT = 4
+        TEXT_PADX = 5
 
-        # Target folder
-        tk.Label(self, text="Dossier cible").pack(anchor="w", padx=10, pady=(10, 0))
-        self.target_var = tk.StringVar()
-        tk.Entry(self, textvariable=self.target_var, width=70).pack(padx=10)
-        tk.Button(self, text="Parcourir", command=self.select_target).pack(pady=5)
+        # ─────────────── Dossiers ───────────────
+        paths_frame = tk.LabelFrame(self, text="Dossiers")
+        paths_frame.pack(fill="x", padx=10, pady=10)
 
-        # Ignored folders
-        tk.Label(self, text="Dossiers à ignorer (un par ligne)").pack(
-            anchor="w", padx=10, pady=(10, 0)
+        tk.Frame(paths_frame, height=6).pack()  # spacer sous le titre
+
+        tk.Label(paths_frame, text="Dossier source").pack(anchor="w")
+        tk.Entry(paths_frame, textvariable=self.source_var, width=70).pack(pady=2)
+        tk.Button(paths_frame, text="Parcourir", command=self.select_source).pack(pady=2)
+
+        tk.Label(paths_frame, text="Dossier cible").pack(anchor="w", pady=(10, 0))
+        tk.Entry(paths_frame, textvariable=self.target_var, width=70).pack(pady=2)
+        tk.Button(paths_frame, text="Parcourir", command=self.select_target).pack(pady=2)
+
+        # ─────────────── Options de tri ───────────────
+        options_frame = tk.LabelFrame(self, text="Options de tri")
+        options_frame.pack(fill="x", padx=10, pady=10)
+
+        tk.Frame(options_frame, height=6).pack()  # spacer sous le titre
+
+        tk.Checkbutton(
+            options_frame,
+            text="Aliases (hardlinks de tous les alias d’artistes)",
+            variable=self.aliases_var,
+        ).pack(anchor="w")
+
+        tk.Checkbutton(
+            options_frame,
+            text="Styles (classement par styles)",
+            variable=self.styles_var,
+        ).pack(anchor="w")
+
+        tk.Checkbutton(
+            options_frame,
+            text="Decades (classement par décennies)",
+            variable=self.decades_var,
+        ).pack(anchor="w")
+
+        tk.Checkbutton(
+            options_frame,
+            text="Labels (classement par labels)",
+            variable=self.labels_var,
+        ).pack(anchor="w")
+
+        # ─────────────── Sélections ───────────────
+        tk.Checkbutton(
+            options_frame,
+            text="Sélections (copie de dossiers spécifiques)",
+            variable=self.selections_var,
+            command=self._toggle_selections_text,
+        ).pack(anchor="w", pady=(6, 0))
+
+        self.selections_text = tk.Text(
+            options_frame,
+            width=TEXT_WIDTH,
+            height=TEXT_HEIGHT,
+            state="disabled",
+            bg="#f0f0f0",
+            fg="gray",
+            insertbackground="gray",
         )
-        self.ignore_text = tk.Text(self, height=5, width=70)
-        self.ignore_text.pack(padx=10)
+        self.selections_text.pack(padx=TEXT_PADX, pady=3)
 
-        # Selection 'copy' or 'move'
-        self.is_moving_var = tk.BooleanVar(value=False)
-        tk.Radiobutton(self, text="copy", value=False, variable=self.is_moving_var).pack(side="left", padx=5)
-        tk.Radiobutton(self, text="move", value=True, variable=self.is_moving_var).pack(side="left", padx=5)
+        self.selections_label = tk.Label(
+            options_frame,
+            text="Noms de dossiers séparés par des virgules",
+            fg="gray",
+        )
+        self.selections_label.pack(anchor="w", padx=TEXT_PADX)
 
-        # Start button
+        # ─────────────── Ignorer des dossiers ───────────────
+        tk.Checkbutton(
+            options_frame,
+            text="Ignorer des dossiers",
+            variable=self.ignore_var,
+            command=self._toggle_ignore_text,
+        ).pack(anchor="w", pady=(10, 0))
+
+        self.ignore_text = tk.Text(
+            options_frame,
+            width=TEXT_WIDTH,
+            height=TEXT_HEIGHT,
+            state="disabled",
+            bg="#f0f0f0",
+            fg="gray",
+            insertbackground="gray",
+        )
+        self.ignore_text.pack(padx=TEXT_PADX, pady=3)
+
+        self.ignore_label = tk.Label(
+            options_frame,
+            text="Dossiers séparés par des virgules",
+            fg="gray",
+        )
+        self.ignore_label.pack(anchor="w", padx=TEXT_PADX)
+
+        # ─────────────── Mode ───────────────
+        mode_frame = tk.LabelFrame(self, text="Mode")
+        mode_frame.pack(fill="x", padx=10, pady=10)
+
+        tk.Frame(mode_frame, height=6).pack()  # spacer sous le titre
+
+        tk.Radiobutton(
+            mode_frame,
+            text="Copy",
+            value=False,
+            variable=self.is_moving_var,
+        ).pack(side="left", padx=10)
+
+        tk.Radiobutton(
+            mode_frame,
+            text="Move",
+            value=True,
+            variable=self.is_moving_var,
+        ).pack(side="left")
+
+        # ─────────────── Bouton principal ───────────────
+        bottom_frame = tk.Frame(self)
+        bottom_frame.pack(pady=(8, 6))
+
         tk.Button(
-            self,
+            bottom_frame,
             text="Lancer le tri",
             command=self.start_sorting,
             bg="#4CAF50",
             fg="white",
             height=2,
-        ).pack(pady=20)
+            width=25,
+        ).pack()
 
-    # ─────────────── Sélecteurs de dossier ───────────────
+    # ─────────────────────────────────────────────
+    # Callbacks
+    # ─────────────────────────────────────────────
+    def _toggle_selections_text(self):
+        self._toggle_text_block(
+            self.selections_var.get(),
+            self.selections_text,
+            self.selections_label,
+        )
+
+    def _toggle_ignore_text(self):
+        self._toggle_text_block(
+            self.ignore_var.get(),
+            self.ignore_text,
+            self.ignore_label,
+        )
+
+    def _toggle_text_block(self, enabled, text_widget, label_widget):
+        if enabled:
+            text_widget.config(
+                state="normal",
+                bg="white",
+                fg="black",
+                insertbackground="black",
+            )
+            label_widget.config(fg="black")
+        else:
+            text_widget.delete("1.0", tk.END)
+            text_widget.config(
+                state="disabled",
+                bg="#f0f0f0",
+                fg="gray",
+                insertbackground="gray",
+            )
+            label_widget.config(fg="gray")
+
     def select_source(self):
         path = filedialog.askdirectory()
         if path:
@@ -77,19 +221,14 @@ class MainWindow(tk.Tk):
         if path:
             self.target_var.set(path)
 
-    # ─────────────── Lancer le tri ───────────────
     def start_sorting(self):
-        """
-        Lancement du tri via le controller
-        - Toutes les exceptions dans le main thread Tk sont capturées par tk_exception_handler
-        """
         self.controller.start_sorting()
 
-    # ─────────────── Popups utilisateur ───────────────
+    # ─────────────────────────────────────────────
+    # Popups
+    # ─────────────────────────────────────────────
     def show_error(self, message):
-        """Afficher un message d'erreur pour l'utilisateur"""
         messagebox.showerror("Erreur", message)
 
     def show_info(self, message):
-        """Afficher un message d'information pour l'utilisateur"""
         messagebox.showinfo("Information", message)
