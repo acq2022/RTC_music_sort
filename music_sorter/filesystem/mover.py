@@ -8,14 +8,14 @@ logger = logging.getLogger("Mover")
 
 class Mover:
     def __init__(self):
-        self.builder = PathBuilder()
+        self.path_builder = PathBuilder()
 
     def move_album(self, album, target, is_moving):
-        target_dir = self.builder.album_path(album, target)
+        target_dir = self.path_builder.album_path(album, target)
         target_dir.mkdir(parents=True, exist_ok=True)
         for track in album.tracklist:
             try:
-                track_path = self.builder.get_track_path(track)
+                track_path = self.path_builder.get_track_path(track)
                 dest_path = target_dir / track_path
 
                 if DRY_RUN:

@@ -1,6 +1,9 @@
+import logging
 from pathlib import Path
 from config import UNKNOWN_ARTIST, UNKNOWN_YEAR, UNKNOWN_ALBUM
 from utils.parser import Parser
+
+logger = logging.getLogger("PathBuilder")
 
 class PathBuilder:
     def album_path(self, album, target):
@@ -30,13 +33,13 @@ class PathBuilder:
         return Path(target) / artist / folder_name
     
     def get_artist_name(self, album):
-        if isinstance(album.artists, list) and album.artists:
+        if album.artists:
             first = album.artists[0]
             if hasattr(first, "name"):
                 return first.name.title()  # objet Artist
             else:
                 return str(first).title()  # déjà une chaîne
-        return str(album.artist).title() if album.artist else UNKNOWN_ARTIST
+        return str(album.artists[0]).title() if album.artists[0] else UNKNOWN_ARTIST
     
 
     def get_track_path(self, track):

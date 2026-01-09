@@ -1,6 +1,6 @@
 import logging
-from .discogs_result import DiscogsResult
 from domain.album import Album
+from domain.artist import Artist
 
 logger = logging.getLogger("DiscogsEnricher")
 
@@ -15,7 +15,9 @@ class DiscogsEnricher:
 
         album.title = result.title
         album.album_id = result.id
-        album.artists = result.artists
+        album.artists = [Artist(name=artist.name, aliases=artist.aliases) for artist in result.artists]
+        for artist in album.artists:
+            logger.info(f"ARTIST {artist}, {type(artist)} - NAME {artist.name}, {type(artist.name)}")
         album.year = result.year
 
         label_infos = result.data["labels"][0]
