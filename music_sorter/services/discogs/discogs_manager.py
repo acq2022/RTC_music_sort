@@ -3,6 +3,7 @@ import time
 from .discogs_service import DiscogsService
 from .discogs_matcher  import DiscogsMatcher
 from .discogs_enricher import DiscogsEnricher
+from config import UNKNOWN_ARTIST, VARIOUS_ARTISTS, UNKNOWN_ALBUM
 
 logger = logging.getLogger("DiscogsManager")
 
@@ -21,38 +22,39 @@ class DiscogsManager:
         album_tracklist = album.tracklist
         track = album_tracklist[0].title if album_tracklist else None
 
-        search_attempts = [
-            dict(artist=artist, release_title=album_title, year=album_year, track=track),
-            dict(release_title=album_title, year=album_year, track=track)
-        ]
+        if (artist.name != UNKNOWN_ARTIST or artist.name != VARIOUS_ARTISTS) and album_title != UNKNOWN_ALBUM : # bypass unknown artist & album
+            search_attempts = [
+                dict(artist=artist, release_title=album_title, year=album_year, track=track),
+                dict(release_title=album_title, year=album_year, track=track)
+            ]
 
-        for params in search_attempts:
-            params = {k: v for k, v in params.items() if v} # filtre les valeurs vides
+            for params in search_attempts:
+                params = {k: v for k, v in params.items() if v} # filtre les valeurs vides
 
-            results = self.discogs_service.search(params)
+                results = self.discogs_service.search(params)
 
-            if not results:
-                logger.info(f"[Discogs] Aucun résultat pour {params}")
-                continue
-            
-            for result in results:
-                if not result:
+                if not results:
+                    logger.info(f"[Discogs] Aucun résultat pour {params}")
                     continue
-
-                try:
-                    main_release = self.resolve_main_release(result)
-                    if not main_release:
+                
+                for result in results:
+                    if not result:
                         continue
 
-                    match = self.discogs_matcher.find(album, main_release)
-                    if match:
-                        self.discogs_enricher.apply(album, match)
-                        break
+                    try:
+                        main_release = self.resolve_main_release(result)
+                        if not main_release:
+                            continue
 
-                except Exception as e:
-                    logger.warning(f"[Discogs] Erreur avec un résultat: {e}")
-                    time.sleep(60)
-                    break
+                        match = self.discogs_matcher.find(album, main_release)
+                        if match:
+                            self.discogs_enricher.apply(album, match)
+                            break
+
+                    except Exception as e:
+                        logger.warning(f"[Discogs] Erreur avec un résultat: {e}")
+                        time.sleep(60)
+                        break
 
 
     def resolve_main_release(self, result):
