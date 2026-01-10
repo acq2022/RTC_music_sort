@@ -183,6 +183,7 @@ class Parser:
         import os
         import shutil
         
+        # vérification source
         if not os.path.isfile(src_path):
             return "erreur"
 
@@ -192,7 +193,7 @@ class Parser:
         src_size = os.path.getsize(src_path)
         src_hash = None
 
-        # recherche de doublon par contenu
+        # recherche de doublon par contenu (taille + hash)
         for name in os.listdir(dst_dir):
             candidate = os.path.join(dst_dir, name)
 
@@ -214,6 +215,23 @@ class Parser:
                     os.remove(src_path)
 
                 return "renommé"
+        
+        # collision de nom → garder le plus gros fichier
+        if os.path.exists(dst_path):
+            dst_size = os.path.getsize(dst_path)
+
+            # source + grande → elle remplace la destination
+            if src_size > dst_size:
+                if is_moving:
+                    os.replace(src_path, dst_path)
+                else:
+                    shutil.copy2(src_path, dst_path)
+            # destination + grande ou égale → on garde l'existante
+            else:
+                if is_moving:
+                    os.remove(src_path)
+
+            return "fichiers de même nom : + grand conservé"
 
         # aucun doublon → transfert normal
         if is_moving:
