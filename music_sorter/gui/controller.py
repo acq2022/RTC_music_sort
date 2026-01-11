@@ -53,4 +53,4 @@ class GUIController:
 
     def _get_ignored_dirs(self):
         text = self.window.ignore_text.get("1.0", "end").strip()
-        return [line.strip() for line in text.splitlines() if line.strip()]
+        return [line.strip() for line in text.split(",") if line.strip()]
