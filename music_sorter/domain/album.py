@@ -14,7 +14,7 @@ class Album:
         catno: str | None = None,                   # list -> ['labels'][0]['catno'] => str
         tracklist: list[str] | None = None,         # list
         total_tracks: str | None = None,            # int => len(tracklist)
-        style: list[str] | None = None,             # list
+        styles: list[str] | None = None,             # list
         website: str | None = None,                 # str
         disc_number: str | None = None,             # x NONE
         original_date: str | None = None,           # x NONE (= released? str)
@@ -28,7 +28,7 @@ class Album:
         self.catno = catno
         self.tracklist = tracklist if tracklist is not None else []
         self.total_tracks = total_tracks
-        self.style = style if style is not None else []
+        self.styles = styles if styles is not None else []
         self.website = website
         self.disc_number = disc_number
         self.original_date = original_date
@@ -126,7 +126,7 @@ class Album:
             self._set_var(attr)
         
         # ---- Styles ----
-        style = {
+        styles = {
             genre 
             for track in self.tracklist 
             if track.genre 
@@ -135,7 +135,7 @@ class Album:
             for genre in genre_list
             if genre
         }
-        self.style = sorted(style)
+        self.styles = [] #sorted(styles)
 
     
     # -------------------

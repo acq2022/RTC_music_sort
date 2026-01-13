@@ -25,7 +25,7 @@ class DiscogsEnricher:
         album.catno = clean(label_infos.get("catno"))
 
         album.total_tracks = clean(str(len(result.tracklist)))
-        album.style = result.styles
+        album.styles = result.styles
         album.website = clean(result.url)
         album.original_date = clean(result.data["released"])
         album.release_country = clean(result.country)
