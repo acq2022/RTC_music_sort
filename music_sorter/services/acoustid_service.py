@@ -39,7 +39,7 @@ class AcoustIDService:
                         album = releases[0].get("title", "")
                         date = releases[0].get("date", "")
                 except musicbrainzngs.ResponseError as e:
-                    print(f"Erreur MusicBrainz pour {file_path} :", e)
+                    logger.warning(f"Erreur MusicBrainz pour {file_path} :", e)
 
                 # Retourner les infos
                 return {
@@ -52,11 +52,11 @@ class AcoustIDService:
                 }
 
         except acoustid.NoBackendError:
-            print(f"Erreur : Chromaprint non trouvé pour {file_path}")
+            logger.warning(f"Erreur : Chromaprint non trouvé pour {file_path}")
         except acoustid.FingerprintGenerationError:
-            print(f"Erreur de génération d'empreinte pour {file_path}")
+            logger.warning(f"Erreur de génération d'empreinte pour {file_path}")
         except acoustid.WebServiceError as e:
-            print(f"Erreur API AcoustID pour {file_path} : {e}")
+            logger.warning(f"Erreur API AcoustID pour {file_path} : {e}")
 
         # En cas d'erreur, renvoyer un dictionnaire vide pour ce fichier
         return {

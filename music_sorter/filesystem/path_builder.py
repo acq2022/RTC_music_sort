@@ -12,18 +12,21 @@ class PathBuilder:
     # Méthodes publiques pour obtenir les chemins
     # --------------------
 
-    def artist_album_path(self, album, target):
-        artist = Parser.sanitize_name(self._get_artist_name(album))
+    def artist_album_path(self, album, artist, target):
+        artist_sanitized = Parser.sanitize_name(artist).title()
         folder_name, _ = self._album_folder_name(album)
-        return Path(target) / "Artists" / artist / folder_name
-    
+        return Path(target) / "Artists" / artist_sanitized / folder_name
+
+    def alias_album_path(self, album, alias, target):
+        alias_sanitized = Parser.sanitize_name(alias).title()
+        folder_name, _ = self._album_folder_name(album)
+        return Path(target) / "Artists" / alias_sanitized / folder_name
 
     def decade_album_path(self, album, target):
         artist = Parser.sanitize_name(self._get_artist_name(album))
         folder_name, _ = self._album_folder_name(album)
         decade = (int(album.year) // 10) * 10 if album.year else "Unknown Decade"
         return Path(target) / "Decades" / str(decade) / artist / folder_name
-    
 
     def label_album_path(self, album, target):
         artist = Parser.sanitize_name(self._get_artist_name(album))
@@ -77,9 +80,9 @@ class PathBuilder:
     # Retourne le nom de l'artiste, formaté proprement
     def _get_artist_name(self, album):
         if album.artists:
-            first = album.artists[0]
-            if hasattr(first, "name"):
-                return first.name.title()  # objet Artist
+            main_artist = album.artists[0]
+            if hasattr(main_artist, "name"):
+                return main_artist.name.title()  # objet Artist
             else:
-                return str(first).title()  # déjà une chaîne
+                return str(main_artist).title()  # déjà une chaîne
         return UNKNOWN_ARTIST
