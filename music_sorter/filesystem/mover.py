@@ -13,7 +13,7 @@ class Mover:
     def __init__(self):
         self.path_builder = PathBuilder()
 
-    def move_album(self, album, target, is_moving):
+    def move_album(self, album, target, is_aliases, is_styles, is_decades, is_labels, selectioned_dir, is_moving):
 
         # TEMP
         
@@ -37,35 +37,39 @@ class Mover:
             destinations["artists"] = artist_target_dir
 
         # --- Aliases ---
-        alias_target_dir: list[Path] = []
-        for artist in album.artists:
-            for alias in artist.aliases:
-                alias_dir = self.path_builder.alias_album_path(album, alias.name, target)
-                alias_dir.mkdir(parents=True, exist_ok=True)
-                alias_target_dir.append(alias_dir)
-        if alias_target_dir:
-            destinations["aliases"] = alias_target_dir
+        if is_aliases:
+            alias_target_dir: list[Path] = []
+            for artist in album.artists:
+                for alias in artist.aliases:
+                    alias_dir = self.path_builder.alias_album_path(album, alias.name, target)
+                    alias_dir.mkdir(parents=True, exist_ok=True)
+                    alias_target_dir.append(alias_dir)
+            if alias_target_dir:
+                destinations["aliases"] = alias_target_dir
 
         # --- Decades ---
-        if album.year and album.year != UNKNOWN_YEAR:
-            decade_target_dir = self.path_builder.decade_album_path(album, target)
-            decade_target_dir.mkdir(parents=True, exist_ok=True)
-            destinations["decades"] = [decade_target_dir]
+        if is_decades:
+            if album.year and album.year != UNKNOWN_YEAR:
+                decade_target_dir = self.path_builder.decade_album_path(album, target)
+                decade_target_dir.mkdir(parents=True, exist_ok=True)
+                destinations["decades"] = [decade_target_dir]
 
         # --- Labels ---
-        if album.label:
-            label_target_dir = self.path_builder.label_album_path(album, target)
-            label_target_dir.mkdir(parents=True, exist_ok=True)
-            destinations["labels"] = [label_target_dir]
+        if is_labels:
+            if album.label:
+                label_target_dir = self.path_builder.label_album_path(album, target)
+                label_target_dir.mkdir(parents=True, exist_ok=True)
+                destinations["labels"] = [label_target_dir]
 
         # --- Styles ---
-        style_target_dir: list[Path] = []
-        for style in album.styles:
-            style_dir = self.path_builder.style_album_path(album, style, target)
-            style_dir.mkdir(parents=True, exist_ok=True)
-            style_target_dir.append(style_dir)
-        if style_target_dir:
-            destinations["styles"] = style_target_dir
+        if is_styles:
+            style_target_dir: list[Path] = []
+            for style in album.styles:
+                style_dir = self.path_builder.style_album_path(album, style, target)
+                style_dir.mkdir(parents=True, exist_ok=True)
+                style_target_dir.append(style_dir)
+            if style_target_dir:
+                destinations["styles"] = style_target_dir
 
 
         # TRACKS
@@ -88,7 +92,7 @@ class Mover:
                         if DRY_RUN:
                             logger.info(f"[DRY-RUN] {track.path} → {dest_path}")
                         else:
-                            Parser.deplacer_fichier_sans_doublon(temp_source, dest_path, is_moving= False)
+                            Parser.deplacer_fichier_sans_doublon(temp_source, dest_path, is_moving= is_moving)
 
                 # --- Suppression de la source originale (si déplacement)
                 if is_moving and not DRY_RUN:

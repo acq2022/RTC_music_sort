@@ -13,6 +13,11 @@ class GUIController:
         source = self.window.source_var.get()
         target = self.window.target_var.get()
         ignored = self._get_ignored_dirs()
+        selectioned = self._get_selectioned_dirs()
+        is_aliases = self.window.is_aliases_var.get()
+        is_styles = self.window.is_styles_var.get()
+        is_decades = self.window.is_decades_var.get()
+        is_labels = self.window.is_labels_var.get()
         is_moving = self.window.is_moving_var.get()
 
         if not source or not target:
@@ -25,32 +30,38 @@ class GUIController:
         # Lancer dans un thread pour éviter le gel de Tkinter
         thread = threading.Thread(
             target=self._thread_wrapper,
-            args=(Path(source), Path(target), ignored, is_moving),
+            args=(Path(source), Path(target), is_aliases, is_styles, is_decades, is_labels, selectioned, ignored, is_moving),
             daemon=True,
         )
         thread.start()
 
-    def _thread_wrapper(self, source, target, ignored, is_moving):
+    def _thread_wrapper(self, source, target, is_aliases, is_styles, is_decades, is_labels, selectioned, ignored, is_moving):
         """
         Wrapper pour exécuter le tri dans un thread et afficher
         correctement toutes les exceptions dans le terminal VS Code.
         """
         try:
-            self._run_sorter(source, target, ignored, is_moving)
+            self._run_sorter(source, target, is_aliases, is_styles, is_decades, is_labels, selectioned, ignored, is_moving)
         except Exception:
             # Affiche le traceback complet dans le terminal VS Code
             traceback.print_exc()
             # Affiche un message générique à l'utilisateur
             self.window.show_error("Une erreur est survenue. Consultez le terminal pour plus de détails.")
 
-    def _run_sorter(self, source, target, ignored, is_moving):
+    def _run_sorter(self, source, target, is_aliases, is_styles, is_decades, is_labels, selectioned, ignored, is_moving):
         """
         Exécution réelle du tri.
         """
         sorter = Sorter()
-        sorter.process(source, target, ignored, is_moving)
+        sorter.process(source, target, is_aliases, is_styles, is_decades, is_labels, selectioned, ignored, is_moving)
         self.window.show_info("Tri terminé (ou DRY-RUN terminé).")
 
     def _get_ignored_dirs(self):
         text = self.window.ignore_text.get("1.0", "end").strip()
         return [line.strip() for line in text.split(",") if line.strip()]
+    
+    def _get_selectioned_dirs(self):
+        text = self.window.selections_text.get("1.0", "end").strip()
+        return [line.strip() for line in text.split(",") if line.strip()]
+    
+    

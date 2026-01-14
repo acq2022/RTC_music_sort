@@ -27,10 +27,10 @@ class MainWindow(tk.Tk):
 
         self.is_moving_var = tk.BooleanVar(value=False)
 
-        self.aliases_var = tk.BooleanVar(value=False)
-        self.styles_var = tk.BooleanVar(value=False)
-        self.decades_var = tk.BooleanVar(value=False)
-        self.labels_var = tk.BooleanVar(value=False)
+        self.is_aliases_var = tk.BooleanVar(value=False)
+        self.is_styles_var = tk.BooleanVar(value=False)
+        self.is_decades_var = tk.BooleanVar(value=False)
+        self.is_labels_var = tk.BooleanVar(value=False)
 
         self.selections_var = tk.BooleanVar(value=False)
         self.ignore_var = tk.BooleanVar(value=False)
@@ -68,25 +68,25 @@ class MainWindow(tk.Tk):
         tk.Checkbutton(
             options_frame,
             text="Aliases (ajoute les alias des artistes - hardlinks)",
-            variable=self.aliases_var,
+            variable=self.is_aliases_var,
         ).pack(anchor="w")
 
         tk.Checkbutton(
             options_frame,
             text="Styles (classement par styles - hardlinks)",
-            variable=self.styles_var,
+            variable=self.is_styles_var,
         ).pack(anchor="w")
 
         tk.Checkbutton(
             options_frame,
             text="Decades (classement par décennies - hardlinks)",
-            variable=self.decades_var,
+            variable=self.is_decades_var,
         ).pack(anchor="w")
 
         tk.Checkbutton(
             options_frame,
             text="Labels (classement par labels - hardlinks)",
-            variable=self.labels_var,
+            variable=self.is_labels_var,
         ).pack(anchor="w")
 
         # ─────────────── Sélections ───────────────

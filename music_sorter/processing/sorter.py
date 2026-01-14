@@ -8,7 +8,7 @@ from filesystem.mover import Mover
 logger = logging.getLogger("Sorter")
 
 class Sorter:
-    def process(self, source_dir, target_dir, ignored_dirs=None, is_moving=False):
+    def process(self, source_dir, target_dir, is_aliases=False, is_styles=False, is_decades=False, is_labels=False, selectioned_dir=None, ignored_dirs=None, is_moving=False):
         scanner = Scanner()
         track_builder = TrackBuilder()
         album_builder = AlbumBuilder()
@@ -21,4 +21,4 @@ class Sorter:
         enricher.enrich_albums(albums)
 
         for album in albums:
-            mover.move_album(album, target_dir, is_moving)
+            mover.move_album(album, target_dir, is_aliases, is_styles, is_decades, is_labels, selectioned_dir, is_moving)
