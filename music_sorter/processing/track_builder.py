@@ -1,6 +1,7 @@
 from services.tags_reader import TagsReader
 from services.acoustid_service import AcoustIDService
 from domain.track import Track
+from utils.parser import Parser
 
 class TrackBuilder:
     def build(self, paths):
@@ -30,20 +31,25 @@ class TrackBuilder:
 
         # création d'un dictionnaire pour lookup rapide
         lookup = {tag["path"]: tag for tag in infos_from_shazam}
+
+        # ne remplit que si pas de valeur pré-existente
+        if tag["path"] in lookup:
+            acoustid_data = lookup[tag["path"]]
+            for key, value in acoustid_data.items():
+                if tag.get(key) is None and value is not None:
+                    tag[key] = value
         
         # mise à jour de tags
         # création des Track
         for tag in files_with_tags:
             if tag["path"] in lookup:
                 tag.update(lookup[tag["path"]])
-                tag.update(lookup[tag["year"]])
-                tag.update(lookup[tag["album_title"]])
 
             tracks.append(Track(
                 path = tag["path"],
                 album_artists = tag["album_artists"],
                 artists = tag["artists"],
-                year = tag["year"],
+                year = Parser.extract_year(tag["year"]),
                 album_title = tag["album_title"],
                 label = tag["label"],
                 catno = tag["catno"],

@@ -50,7 +50,7 @@ class TagsReader:
             "path": path,
             "album_artists": [get("albumartist")] or [get("album_artists")] or [get("album artist")],
             "artists": [get("artist")] or [get("artists")],
-            "year": Parser.extract_year(get("date")) or Parser.extract_year(get("year")),
+            "year": get("date") or get("year"),
             "album_title": get("album"),
             "label": get("organization") or get("label"),
             "catno": get("catalognumber"),
