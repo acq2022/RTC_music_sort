@@ -269,3 +269,23 @@ class Parser:
         else:
             shutil.copytree(str(source), str(dossier_final))
         return f"Dossier {source} copié vers : {dossier_final}"
+    
+    @staticmethod
+    def normalise_str(s: str) -> str:
+        import unicodedata
+        # Normalisation de la casse (Unicode-safe)
+        s = s.casefold()
+
+        # Remplacer explicitement les ligatures
+        s = s.replace("Œ", "OE").replace("œ", "oe")
+
+        # Décomposition Unicode (é → e + ́)
+        s = unicodedata.normalize("NFD", s)
+
+        # Suppression des accents
+        s = "".join(
+            c for c in s
+            if unicodedata.category(c) != "Mn"
+        )
+
+        return s
