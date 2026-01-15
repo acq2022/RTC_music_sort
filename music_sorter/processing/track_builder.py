@@ -7,17 +7,17 @@ class TrackBuilder:
         tags_reader = TagsReader()
         acoustid = AcoustIDService()
 
-        tags = []
+        files_with_tags = []
         paths_tracks_to_shazam = []
         infos_from_shazam = []
         tracks = []
 
         # récupération des tags => TAG_READER
         for path in paths:
-            tags.append(tags_reader.read(path))
+            files_with_tags.append(tags_reader.read(path))
         
         # récupération des paths des tracks dont l'album est inconnu
-        for tag in tags:
+        for tag in files_with_tags:
             if tag["album_title"] == None:
                 paths_tracks_to_shazam.append(tag["path"])
 
@@ -33,9 +33,11 @@ class TrackBuilder:
         
         # mise à jour de tags
         # création des Track
-        for tag in tags:
+        for tag in files_with_tags:
             if tag["path"] in lookup:
                 tag.update(lookup[tag["path"]])
+                tag.update(lookup[tag["year"]])
+                tag.update(lookup[tag["album_title"]])
 
             tracks.append(Track(
                 path = tag["path"],

@@ -13,7 +13,7 @@ class Mover:
     def __init__(self):
         self.path_builder = PathBuilder()
 
-    def move_album(self, album, target, is_aliases, is_styles, is_decades, is_labels, selectioned_dir, is_moving):
+    def move_album(self, album, target, is_aliases, is_styles, is_decades, is_labels, is_moving):
 
         # TEMP
         
@@ -92,7 +92,7 @@ class Mover:
                         if DRY_RUN:
                             logger.info(f"[DRY-RUN] {track.path} → {dest_path}")
                         else:
-                            Parser.deplacer_fichier_sans_doublon(temp_source, dest_path, is_moving= is_moving)
+                            Parser.deplacer_fichier_sans_doublon(temp_source, dest_path, is_moving=is_moving)
 
                 # --- Suppression de la source originale (si déplacement)
                 if is_moving and not DRY_RUN:
@@ -110,3 +110,13 @@ class Mover:
                 logger.info(f"Dossier TEMP supprimé : {temp_dir}")
             except Exception as e:
                 logger.warning(f"Impossible de supprimer TEMP {temp_dir} : {e}")
+
+
+    def move_folders(self, selectioned_dir_path, target, is_moving):
+        for path in selectioned_dir_path:
+            self._move_folder(path, target, is_moving)
+        
+    def _move_folder(self, path, target, is_moving):
+        final_selection_dir = Path(target) / "Selections" / path.parent.name
+        final_selection_dir.mkdir(parents=True, exist_ok=True)
+        Parser.deplacer_dossier(path, final_selection_dir, is_moving=is_moving)

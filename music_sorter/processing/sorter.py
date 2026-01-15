@@ -15,10 +15,14 @@ class Sorter:
         enricher = MetadataEnricher()
         mover = Mover()
 
-        paths = scanner.scan(source_dir, ignored_dirs)
+        scan_result = scanner.scan(source_dir, ignored_dirs, selectioned_dir)
+        paths = scan_result.file_paths
+        selectioned_dir_path_list = scan_result.selectioned_dir_paths
+        mover.move_folders(selectioned_dir_path_list, target_dir, is_moving)
+
         tracks = track_builder.build(paths)
         albums = album_builder.build(tracks)
         enricher.enrich_albums(albums)
 
         for album in albums:
-            mover.move_album(album, target_dir, is_aliases, is_styles, is_decades, is_labels, selectioned_dir, is_moving)
+            mover.move_album(album, target_dir, is_aliases, is_styles, is_decades, is_labels, is_moving)

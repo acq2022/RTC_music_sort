@@ -42,7 +42,7 @@ class DiscogsManager:
                         continue
 
                     try:
-                        main_release = self.resolve_main_release(result)
+                        main_release = self._resolve_main_release(result)
                         if not main_release:
                             continue
 
@@ -57,7 +57,7 @@ class DiscogsManager:
                         break
 
 
-    def resolve_main_release(self, result):
+    def _resolve_main_release(self, result):
         release_id = getattr(result, "id", None)
         if not release_id:
             return None

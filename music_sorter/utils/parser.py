@@ -241,3 +241,31 @@ class Parser:
 
         return "transféré"
         
+    @staticmethod
+    def deplacer_dossier(source: str, destination: str, is_moving: bool) -> str:
+        import shutil
+        from pathlib import Path
+
+        source = Path(source)
+        destination = Path(destination)
+
+        if not source.exists() or not source.is_dir():
+            return "erreur"
+        
+        # Nom du dossier à créer dans la destination
+        base_nom = source.name
+        dossier_final = destination / base_nom
+        compteur = 1
+
+        # Boucle pour trouver un nom unique
+        while dossier_final.exists():
+            dossier_final = destination / f"{base_nom}_{compteur}"
+            compteur += 1
+
+        # Copier le dossier
+        if is_moving:
+            shutil.move(source, dossier_final)
+            return f"Dossier {source} déplacé vers : {dossier_final}"
+        else:
+            shutil.copytree(str(source), str(dossier_final))
+        return f"Dossier {source} copié vers : {dossier_final}"

@@ -1,6 +1,4 @@
 import logging
-from .discogs_result import DiscogsResult
-from domain.album import Album
 
 logger = logging.getLogger("DiscogsMatcher")
 
