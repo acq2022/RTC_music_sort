@@ -53,22 +53,22 @@ class DiscogsManager:
                             self.discogs_enricher.apply(album, match)
                             break
 
-                    except Exception as e:
-                        logger.warning(f"[Discogs] Exception erreur avec un résultat: {e} - tpe {type(e)}")
-                        time.sleep(60)
-                        break
-
-                    """except HTTPError as e:
+                    except HTTPError as e:
                         logger.warning(f"[Discogs] HTTPError avec un résultat: {e}")
                         if e.status_code == 429:
                             time.sleep(60)
+                            continue
                     except JSONDecodeError as e:
                         logger.warning(f"[Discogs] JSONDecodeError réponse invalide (JSON): {e}")
                         time.sleep(60)
                         continue
                     except Exception as e:
                         logger.warning(f"[Discogs] Exception erreur avec un résultat: {e} - tpe {type(e)}")
-                        continue"""
+                        continue
+                    '''except Exception as e:
+                        logger.warning(f"[Discogs] Exception erreur avec un résultat: {e} - tpe {type(e)}")
+                        time.sleep(60)
+                        break'''
 
 
     def _resolve_main_release(self, result):
