@@ -18,7 +18,7 @@ class Mover:
         # TEMP
         
         # --- Construction du dossier TEMP
-        temp_dir = Path(album.tracklist[0].path).parent / "TEMP"
+        temp_dir = Path(target) / "TEMP"
         temp_dir.mkdir(parents=True, exist_ok=True)
 
 
@@ -119,4 +119,4 @@ class Mover:
     def _move_folder(self, path, target, is_moving):
         final_selection_dir = Path(target) / "Selections" / path.parent.name
         final_selection_dir.mkdir(parents=True, exist_ok=True)
-        Parser.deplacer_dossier(path, final_selection_dir, is_moving=is_moving)
+        logger.info(Parser.deplacer_dossier(path, final_selection_dir, is_moving=is_moving))

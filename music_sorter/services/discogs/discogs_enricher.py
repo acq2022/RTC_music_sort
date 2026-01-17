@@ -16,8 +16,6 @@ class DiscogsEnricher:
         album.title = result.title
         album.album_id = result.id
         album.artists = [Artist(name=artist.name, aliases=artist.aliases) for artist in result.artists]
-        for artist in album.artists:
-            logger.info(f"ARTIST {artist}, {type(artist)} - NAME {artist.name}, {type(artist.name)}")
         album.year = result.year
 
         label_infos = result.data["labels"][0]

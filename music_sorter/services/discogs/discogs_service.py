@@ -38,12 +38,12 @@ class DiscogsService:
         try:
             results = self.client.search(**params)
             if not results:
-                logger.info(f' {params} : non trouvé sur discogs :(')
+                #logger.info(f' {params} : non trouvé sur discogs :(')
                 return []
-            logger.info(f' {params} : trouvé sur discogs :)')
+            #logger.info(f' {params} : trouvé sur discogs :)')
             return results
         except Exception as e:
-            logger.debug(f"[Discogs] Skipped result: {e}")
+            logger.warning(f"[Discogs] Skipped result: {e}")
             return []
     
     
@@ -52,7 +52,7 @@ class DiscogsService:
         try:
             return self.client.release(id)
         except Exception as e:
-            logger.debug(f"[Discogs] Release {id} inaccessible {e}")
+            logger.warning(f"[Discogs] Release {id} inaccessible {e}")
             return []
     
     

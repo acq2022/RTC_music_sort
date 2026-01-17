@@ -1,4 +1,5 @@
 import logging
+import time
 
 logger = logging.getLogger("DiscogsMatcher")
 
@@ -16,7 +17,14 @@ class DiscogsMatcher:
             return None
 
         for track in album.tracklist:
-            title = getattr(track, "title", None)
+            try:
+                title = getattr(track, "title", None)
+            except Exception as e:
+                if e.response.status_code == 429:
+                    logger.warning("Limite de rate Discogs atteinte !")
+                    time.sleep(60)
+                else:
+                    logger.warning(f"[Discogs] Erreur title: {e}")
             if not title:
                 return None
 

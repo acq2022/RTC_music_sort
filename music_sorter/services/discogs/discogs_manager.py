@@ -1,5 +1,7 @@
 import logging
 import time
+from discogs_client.exceptions import HTTPError
+from json import JSONDecodeError
 from .discogs_service import DiscogsService
 from .discogs_matcher  import DiscogsMatcher
 from .discogs_enricher import DiscogsEnricher
@@ -34,7 +36,7 @@ class DiscogsManager:
                 results = self.discogs_service.search(params)
 
                 if not results:
-                    logger.info(f"[Discogs] Aucun résultat pour {params}")
+                    logger.info(f"[Discogs] Aucun résultat pour : {params['artist'].name if 'artist' in params else UNKNOWN_ARTIST} - {params['release_title']} - {params['year']} - {params['track']}")
                     continue
                 
                 for result in results:
@@ -52,9 +54,21 @@ class DiscogsManager:
                             break
 
                     except Exception as e:
-                        logger.warning(f"[Discogs] Erreur avec un résultat: {e}")
+                        logger.warning(f"[Discogs] Exception erreur avec un résultat: {e} - tpe {type(e)}")
                         time.sleep(60)
                         break
+
+                    """except HTTPError as e:
+                        logger.warning(f"[Discogs] HTTPError avec un résultat: {e}")
+                        if e.status_code == 429:
+                            time.sleep(60)
+                    except JSONDecodeError as e:
+                        logger.warning(f"[Discogs] JSONDecodeError réponse invalide (JSON): {e}")
+                        time.sleep(60)
+                        continue
+                    except Exception as e:
+                        logger.warning(f"[Discogs] Exception erreur avec un résultat: {e} - tpe {type(e)}")
+                        continue"""
 
 
     def _resolve_main_release(self, result):

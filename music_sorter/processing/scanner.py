@@ -1,7 +1,10 @@
+import logging
 from pathlib import Path
 from config import SUPPORTED_EXTENSIONS
 from processing.scan_result import ScanResult
 from utils.parser import Parser
+
+logger = logging.getLogger("Scanner")
 
 class Scanner:
 

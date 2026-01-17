@@ -1,15 +1,19 @@
 import threading
+import config
+import time
+import traceback  # <-- pour afficher les tracebacks
 from pathlib import Path
 from processing.sorter import Sorter
-import config
-import traceback  # <-- pour afficher les tracebacks
 
 
 class GUIController:
     def __init__(self, window):
         self.window = window
+        self.start = None
 
     def start_sorting(self):
+        self.start = time.perf_counter()
+
         source = self.window.source_var.get()
         target = self.window.target_var.get()
         ignored = self._get_ignored_dirs()
@@ -54,14 +58,14 @@ class GUIController:
         """
         sorter = Sorter()
         sorter.process(source, target, is_aliases, is_styles, is_decades, is_labels, selectioned, ignored, is_moving)
-        self.window.show_info("Tri terminé (ou DRY-RUN terminé).")
+        self.window.show_info(f"Tri terminé en {time.perf_counter() - self.start:.1f} secondes.")
 
     def _get_ignored_dirs(self):
         text = self.window.ignore_text.get("1.0", "end").strip()
-        return [line.strip() for line in text.split(",") if line.strip()]
+        return [line.strip() for line in text.splitlines() if line.strip()]
     
     def _get_selectioned_dirs(self):
         text = self.window.selections_text.get("1.0", "end").strip()
-        return [line.strip() for line in text.split(",") if line.strip()]
+        return [line.strip() for line in text.splitlines() if line.strip()]
     
     

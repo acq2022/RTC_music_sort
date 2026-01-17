@@ -185,7 +185,7 @@ class Parser:
         
         # vérification source
         if not os.path.isfile(src_path):
-            return "erreur"
+            return f"Erreur lors du déplacement : {src_path} n'est pas un fichier"
 
         dst_dir = os.path.dirname(dst_path)
         os.makedirs(dst_dir, exist_ok=True)
@@ -209,12 +209,13 @@ class Parser:
             # doublon réel → renommage STRICT
             if Parser._hash_fichier(candidate) == src_hash:
                 if candidate != dst_path:
-                    os.replace(candidate, dst_path)
+                    if os.path.exists(dst_path):
+                        os.remove(dst_path)
+                    os.link(src_path, dst_path)
 
                 if is_moving:
                     os.remove(src_path)
-
-                return "renommé"
+                return f"doublon détecté pour {dst_path}, hardlink créé"
         
         # collision de nom → garder le plus gros fichier
         if os.path.exists(dst_path):
@@ -222,24 +223,17 @@ class Parser:
 
             # source + grande → elle remplace la destination
             if src_size > dst_size:
-                if is_moving:
-                    os.replace(src_path, dst_path)
-                else:
-                    shutil.copy2(src_path, dst_path)
-            # destination + grande ou égale → on garde l'existante
+                os.remove(dst_path)
             else:
                 if is_moving:
                     os.remove(src_path)
-
-            return "fichiers de même nom : + grand conservé"
+                return f"fichiers existant {dst_path} conservé"
 
         # aucun doublon → transfert normal
+        os.link(src_path, dst_path)
         if is_moving:
-            os.replace(src_path, dst_path)
-        else:
-            shutil.copy2(src_path, dst_path)
-
-        return "transféré"
+            os.remove(src_path)
+        return f"{src_path} transféré, hardlink créé"
         
     @staticmethod
     def deplacer_dossier(source: str, destination: str, is_moving: bool) -> str:
@@ -273,19 +267,13 @@ class Parser:
     @staticmethod
     def normalise_str(s: str) -> str:
         import unicodedata
-        # Normalisation de la casse (Unicode-safe)
-        s = s.casefold()
-
-        # Remplacer explicitement les ligatures
-        s = s.replace("Œ", "OE").replace("œ", "oe")
-
-        # Décomposition Unicode (é → e + ́)
-        s = unicodedata.normalize("NFD", s)
-
-        # Suppression des accents
-        s = "".join(
-            c for c in s
-            if unicodedata.category(c) != "Mn"
-        )
-
+        import re
+        
+        s = s.casefold()                                                # Normalisation de la casse (Unicode-safe)
+        s = s.replace("Œ", "OE").replace("œ", "oe")                     # Remplace explicitement les ligatures
+        s = unicodedata.normalize("NFD", s)                             # Décomposition Unicode (é → e + ́)
+        s = "".join(c for c in s if unicodedata.category(c) != "Mn")    # Suppression des accents
+        s = re.sub(r"([a-z])([A-Z])", r"\1 \2", s)                      # Séparation des mots camelCase ou PascalCase
+        s = re.sub(r"[^a-z0-9]", " ", s)                                # Normalisation des séparateurs
+        s = s.replace(" ", "")
         return s
